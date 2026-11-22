@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اعرِفْ موجتَك</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE serious, warm, guided: a calm companion that always says what to do next
+   IDEA a night road you walk once: a camera travels along the hand-drawn map from station to station, one step per screen
+   PICTURE the map itself, framed close on the current station, with live effects (eye feeding the brain, pressure, waves, gates)
+   COLOUR night ground that changes per chapter; one yellow action button everywhere; cyan imagination, mint gates, coral harm
+   TYPE Cairo 800 for titles + IBM Plex Sans Arabic for text
+   LAYOUT phone: header, picture, short text, one big button at the bottom. Laptop: picture beside the text, button under the text */
+:root{color-scheme:dark;--bg:#0b1216;--ac:#ffd27a;--ink:#f1f5f2;--muted:#a9bcb6;--gold:#ffc94d;--cyan:#36c2d6;--mint:#4ee0a6;--coral:#ff7a7a;--sea:#4aa8e8;--glass:rgba(255,255,255,.05);--edge:rgba(255,255,255,.11)}
+*{box-sizing:border-box;min-width:0}
+html,body{height:100%;margin:0;overflow:hidden}
+#app{overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:17px/1.75 "IBM Plex Sans Arabic",Tahoma,sans-serif;overflow:hidden;transition:background-color .9s ease;-webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:800;line-height:1.3;margin:0;text-wrap:balance}
+button{font-family:inherit}
+svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
+#app{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);max-width:1320px;margin:0 auto}
+/* header */
+.top{display:flex;align-items:center;gap:10px;padding:8px 12px 6px}
+.icon{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.icon:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.where{flex:1;display:flex;align-items:center;gap:8px}
+.where b{font:800 17px "Cairo",sans-serif;color:var(--ac);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .8s}
+.where span{margin-inline-start:auto;color:var(--muted);font-size:14px;white-space:nowrap}
+.prog{display:flex;gap:5px;padding:0 12px 10px}
+.prog i{display:block;height:5px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+.prog i b{display:block;height:100%;width:0;background:var(--ac);border-radius:5px;transition:width .6s ease,background-color .8s}
+/* stage */
+.stage{display:grid;grid-template-rows:auto minmax(0,1fr);min-height:0}
+.visual{position:relative;height:var(--vh,42vh);margin:0 12px;border-radius:24px;overflow:hidden;border:1px solid var(--edge);background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--ac) 13%,transparent),rgba(0,0,0,.28) 78%);transition:height .6s ease}
+.visual[data-h=x]{--vh:20vh}.visual[data-h=s]{--vh:27vh}.visual[data-h=n]{--vh:37vh}.visual[data-h=t]{--vh:48vh}
+#map{position:absolute;inset:0;width:100%;height:100%;transition:opacity .6s ease;pointer-events:none}
+.visual.altOn #map{opacity:0}
+.alt{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s;display:grid;place-items:center;padding:10px}
+.alt.on{opacity:1;visibility:visible}
+.alt>svg{width:100%;height:100%;max-height:100%}
+.banner{position:absolute;inset-inline:0;top:12px;margin:auto;width:max-content;max-width:90%;text-align:center;background:rgba(5,12,15,.86);border:1px solid var(--edge);border-radius:20px;padding:12px 26px;opacity:0;transform:scale(.94);transition:opacity .45s,transform .45s;pointer-events:none;z-index:4}
+.banner.on{opacity:1;transform:none}
+.banner small{display:block;color:var(--muted);font-size:14px}
+.banner b{font:800 22px "Cairo",sans-serif;color:var(--ac)}
+.side{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0}
+.card{overflow-y:auto;padding:14px 18px 20px;overscroll-behavior:contain;scrollbar-width:thin}
+.card.more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 46px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 46px),transparent)}
+.card h1{font-size:clamp(28px,5vw,40px)}
+.card h2{font-size:clamp(24px,4vw,32px);color:var(--ac);margin-bottom:6px;transition:color .8s}
+.card :where(p:not(.q)){margin:0}
+.card>p+*,.card>*+p{margin-top:14px}
+.kicker{color:var(--muted);font-size:14px;margin:0 0 4px!important}
+.call{border-inline-start:4px solid var(--ac);background:color-mix(in srgb,var(--ac) 10%,transparent);border-radius:12px;padding:10px 14px;margin:10px 0 0;font-weight:500}
+.call.mint{border-color:var(--mint);background:rgba(78,224,166,.1)}
+.call.warn{border-color:var(--coral);background:rgba(255,122,122,.1)}
+.how{list-style:none;padding:0;margin:12px 0;display:grid;gap:8px}
+.how li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;align-items:start;font-size:16px}
+.how i{font-style:normal;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:#1d1503;font:800 16px "Cairo",sans-serif}
+.priv{font-size:14px;color:var(--muted)}
+.link{background:none;border:0;color:var(--mint);font-weight:700;font-size:16px;padding:8px 0;cursor:pointer;text-decoration:underline}
+.pick2{display:grid;gap:10px;margin-top:12px}
+.pick2 button{min-height:64px;border-radius:18px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);font:800 20px "Cairo",sans-serif;cursor:pointer;transition:.25s}
+.pick2 button.on{background:var(--ac);color:#111;border-color:var(--ac)}
+/* questions */
+.ask{margin-top:10px}
+.ask .lab{font:800 13px "Cairo",sans-serif;color:var(--ac);margin:0 0 2px}
+.ask .q{font-weight:700;font-size:18px;margin:0 0 10px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:start;font:500 16px/1.6 "IBM Plex Sans Arabic",sans-serif;min-height:48px;padding:10px 14px;border-radius:14px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);cursor:pointer;transition:.2s}
+.opts.wait button{animation:nudge 2.4s ease-in-out 1}
+@keyframes nudge{20%{border-color:rgba(255,201,77,.7)}40%{border-color:var(--edge)}}
+.opts button.ok{border-color:var(--mint);background:rgba(78,224,166,.15)}
+.opts button.no{border-color:var(--coral);background:rgba(255,122,122,.12)}
+.fb{margin-top:10px;border-radius:14px;padding:10px 14px;font-size:16px}
+.fb.ok{background:rgba(78,224,166,.1);border-inline-start:4px solid var(--mint)}
+.fb.no{background:rgba(255,122,122,.1);border-inline-start:4px solid var(--coral)}
+.fb b{display:block}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips button{min-height:42px;padding:6px 14px;border-radius:99px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);font:600 15px "IBM Plex Sans Arabic",sans-serif;cursor:pointer;transition:.2s}
+.chips button[aria-pressed=true]{background:var(--ac);color:#111;border-color:var(--ac)}
+.chips.up button{border-color:rgba(255,201,77,.5)}
+.chips.down button{border-color:rgba(78,224,166,.5)}
+.chips button:active{transform:scale(.95)}
+.grpT{font:800 14px "Cairo",sans-serif;margin:12px 0 0}
+/* pressure meter */
+.meter{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin:6px 0 4px}
+.meter span{height:10px;border-radius:6px;background:rgba(255,255,255,.12);transition:background-color .35s}
+.mlab{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:12px;color:var(--muted);text-align:center}
+.zone{margin-top:8px;min-height:3.4em}
+.zone b{font:800 20px "Cairo",sans-serif;margin-inline-end:6px}
+.status{margin-top:8px;border-radius:14px;padding:10px 14px;background:rgba(0,0,0,.25);border:1px solid var(--edge);min-height:3.6em}
+.status b{color:var(--ac)}
+/* two paths */
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.two button{min-height:52px;border-radius:14px;border:1px solid rgba(255,122,122,.5);background:rgba(255,122,122,.06);color:var(--ink);font:800 17px "Cairo",sans-serif;cursor:pointer}
+.two button.on{background:rgba(255,122,122,.22);border-color:var(--coral)}
+.paneX{margin-top:8px;border-radius:14px;padding:10px 14px;background:rgba(255,122,122,.08);border:1px solid rgba(255,122,122,.3);font-size:16px;animation:fin .4s ease}
+@keyframes fin{from{opacity:0;transform:translateY(6px)}}
+/* drops */
+.dropsV{position:absolute;inset:0}
+.dropGL{position:absolute;inset:0}
+.dropGL canvas{position:absolute;inset:0;width:100%!important;height:100%!important;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.dropFall{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;padding:10px 10px 56px}
+.dropGL.gl .dropFall{display:none}
+.dropFall svg{width:100%;height:auto;max-height:100%}
+.dropNames{position:absolute;inset-inline:8px;bottom:8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;z-index:2}
+.dropNames button{min-height:42px;border-radius:12px;border:1px solid var(--edge);background:rgba(5,12,15,.8);color:var(--ink);font:800 16px "Cairo",sans-serif;cursor:pointer}
+.dropNames button.seen{border-color:rgba(255,255,255,.35)}
+.dropNames button.on{background:var(--ac);color:#111;border-color:var(--ac)}
+.dinfo h3{font-size:22px;margin:4px 0}
+.meters{display:grid;gap:5px;margin:6px 0 8px;font-size:14px}
+.meters div{display:grid;grid-template-columns:5em minmax(0,1fr);align-items:center;gap:8px}
+.meters i{height:8px;border-radius:8px;background:rgba(255,255,255,.1);position:relative;overflow:hidden}
+.meters i::after{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:var(--v);border-radius:8px;background:var(--c)}
+.rule{font-weight:700;border-top:1px dashed var(--edge);padding-top:8px;margin-top:6px}
+/* summary */
+.sum{padding-inline-start:20px;margin:6px 0}
+.sum li{margin-bottom:6px}
+.splitT{display:grid;gap:8px;margin-top:8px}
+.splitT div{border-radius:14px;padding:12px 14px}
+.splitT .a{background:rgba(54,194,214,.12);border:1px solid rgba(54,194,214,.4)}
+.splitT .b{background:rgba(255,122,122,.12);border:1px solid rgba(255,122,122,.4)}
+.splitT b{display:block;font:800 17px "Cairo",sans-serif}
+/* action bar */
+.act{padding:7px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--edge)}
+.hint{display:flex;align-items:center;gap:6px;justify-content:center;font-size:13.5px;color:var(--gold);min-height:20px;margin-bottom:5px;font-weight:700}
+.hint:empty{display:none}
+.hint svg{width:18px;height:18px;animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(3px)}}
+.btns{display:flex;gap:10px}
+#back{flex:none;width:58px;height:58px;border-radius:18px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);display:grid;place-items:center;cursor:pointer}
+#back:disabled{opacity:.3;cursor:default}
+#primary{flex:1;min-height:58px;border-radius:18px;border:2px solid var(--gold);background:var(--gold);color:#1d1503;font:800 19px "Cairo",sans-serif;cursor:pointer;transition:background-color .25s,color .25s,transform .1s}
+#primary:active{transform:scale(.98)}
+#primary.locked{background:transparent;color:var(--gold);border-style:dashed;cursor:default}
+#primary.pulse{animation:pulse 1.7s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,201,77,.6)}70%{box-shadow:0 0 0 14px rgba(255,201,77,0)}100%{box-shadow:0 0 0 0 rgba(255,201,77,0)}}
+/* map */
+#map text{paint-order:stroke;stroke:#061014;stroke-width:5px;stroke-linejoin:round}
+#map .el{opacity:0;transition:opacity .8s ease}
+#map .el.on{opacity:1}
+#map.ghost .el.on{opacity:.55}
+#map.focusing .el.on{opacity:.26}
+#map.focusing .el.on.f{opacity:1}
+#map .badge{transform-box:fill-box;transform-origin:center}
+#map .el.on .badge{animation:gp 2.2s ease-in-out infinite}
+@keyframes gp{50%{transform:scale(1.16)}}
+#map .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);transition:transform .6s ease}
+#map.shut .lid{transform:scaleY(1)}
+#map .flow{transition:opacity .5s}
+#map.shut .flow{opacity:0}
+#map .bgl,#map .pgl,#map .spk{transition:opacity .4s}
+#map.sh1 .brainG{animation:shake .18s linear infinite}
+#map.sh2 .brainG{animation:shake .09s linear infinite}
+@keyframes shake{25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1.5px,1px)}75%{transform:translate(1px,1.5px)}}
+#map .wmk{transition:opacity .4s}
+/* menu */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:20}
+.scrim.on{opacity:1;visibility:visible}
+.sheet{position:fixed;inset-inline:0;bottom:0;max-height:88%;overflow:auto;z-index:21;background:#0d171b;border-top:1px solid var(--edge);border-radius:24px 24px 0 0;padding:14px 18px calc(20px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+.sheet.on{transform:none}
+.sheet header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sheet h3{font-size:20px}
+.sheet .row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.seg{display:flex;gap:4px;padding:4px;border-radius:99px;background:rgba(0,0,0,.35);border:1px solid var(--edge)}
+.seg button{min-height:38px;padding:4px 14px;border-radius:99px;border:0;background:transparent;color:var(--muted);font-weight:700;cursor:pointer}
+.seg button[aria-checked=true]{background:var(--gold);color:#1d1503}
+.sw{width:56px;height:32px;border-radius:99px;border:1px solid var(--edge);background:rgba(255,255,255,.1);position:relative;cursor:pointer;flex:none}
+.sw::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:inset-inline-start .25s}
+.sw[aria-checked=true]{background:var(--mint)}
+.sw[aria-checked=true]::after{inset-inline-start:27px}
+.chT{font:800 14px "Cairo",sans-serif;color:var(--muted);margin:14px 0 6px}
+.stL{display:grid;gap:6px}
+.stL button{display:flex;align-items:center;gap:10px;text-align:start;min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);font-size:15px;cursor:pointer}
+.stL button .d{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.25);flex:none}
+.stL button.seen .d{background:var(--mint)}
+.stL button.cur{border-color:var(--gold)}
+.stL button.cur .d{background:var(--gold)}
+.stL button:disabled{opacity:.4;cursor:default}
+.restart{margin-top:14px;width:100%;min-height:48px;border-radius:14px;border:1px solid var(--edge);background:transparent;color:var(--ink);font-weight:700;cursor:pointer}
+/* presenter */
+body.pm .card h2{font-size:clamp(32px,4vw,52px)}
+body.pm .card p,body.pm .sum,body.pm .call{font-size:clamp(19px,2vw,26px)}
+body.pm .ask .q{font-size:clamp(22px,2.3vw,30px)}
+body.pm .opts button{font-size:clamp(18px,1.9vw,24px)}
+body.pm #primary{font-size:22px}
+/* spacing rhythm */
+.card>*{margin-top:0;margin-bottom:0}
+.card>*+*{margin-top:14px}
+.card>h1+*,.card>h2+*,.card>.kicker+*{margin-top:8px}
+.card>.meter+.mlab{margin-top:4px}
+.card>.mlab+.zone{margin-top:10px}
+#panes:empty{display:none}
+#panes{display:grid;gap:10px}
+.paneX{margin-top:0}
+.ask .opts+.fbx:not(:empty){margin-top:10px}
+.fb{margin-top:0}
+.card{padding-bottom:28px}
+.call,.status,.paneX,.splitT div{line-height:1.7}
+.splitT{gap:10px}
+.how{gap:10px}
+.chips{gap:8px 8px}
+.grpT+.chips{margin-top:8px}
+.card>.grpT{margin-top:18px}
+.card>.grpT+.chips{margin-top:8px}
+.dinfo>*+*{margin-top:8px}
+@media(min-width:900px){
+.stage{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px;padding:0 16px 16px}
+.visual{height:auto!important;margin:0}
+.side{border:1px solid var(--edge);border-radius:24px;background:rgba(255,255,255,.025);overflow:hidden}
+.card{padding:26px 28px}
+.sheet{inset-inline:auto 0;inset-inline-start:0;top:0;bottom:0;width:400px;max-height:none;border-radius:0;border-top:0;border-inline-end:1px solid var(--edge);transform:translateX(105%)}
+.sheet.on{transform:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.motion{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="top">
+<button class="icon" id="menuBtn" aria-label="القائمة والمراحل" aria-controls="sheet" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<div class="where"><b id="chName">البداية</b><span id="count"></span></div>
+</header>
+<div class="prog" id="prog"></div>
+<main class="stage">
+<div class="visual" id="visual" data-h="s">
+
+<svg id="map" viewBox="0 0 420 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+<defs>
+<radialGradient id="iris" cx=".45" cy=".4" r=".6"><stop offset="0" stop-color="#fff0b8"/><stop offset=".45" stop-color="#ffc94d"/><stop offset="1" stop-color="#b8740d"/></radialGradient>
+<radialGradient id="bglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#36c2d6" stop-opacity=".55"/><stop offset="1" stop-color="#36c2d6" stop-opacity="0"/></radialGradient>
+<radialGradient id="rglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6f6f" stop-opacity=".75"/><stop offset="1" stop-color="#ff6f6f" stop-opacity="0"/></radialGradient>
+<linearGradient id="bfill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d5965"/><stop offset="1" stop-color="#0d2a31"/></linearGradient>
+<radialGradient id="sglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<linearGradient id="wv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa8e8" stop-opacity=".85"/><stop offset="1" stop-color="#4aa8e8" stop-opacity=".06"/></linearGradient>
+<marker id="aw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f1f5f2"/></marker>
+<marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff7a7a"/></marker>
+<marker id="am" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4ee0a6"/></marker>
+<path id="beam" d="M250 122C244 152 258 186 252 214"/>
+<path id="beam2" d="M258 124C270 162 240 190 260 216"/>
+<path id="o1" d="M98 283Q130 252 166 278"/>
+<path id="o2" d="M166 330Q130 358 98 322"/>
+<g id="brain">
+<path d="M-112 6C-122-38-92-80-48-86C-26-108 22-110 46-92C86-98 120-64 116-24C132 0 120 40 92 52C80 80 40 86 18 72C0 86-34 86-52 70C-86 76-118 52-112 6Z" fill="url(#bfill)" stroke="#8ee8f4" stroke-width="3"/>
+<g fill="none" stroke="#8ee8f4" stroke-width="2.6" stroke-linecap="round" opacity=".8"><path d="M-84-26q16-22 32-6t32-8t30 2t30-6"/><path d="M-96 10q20-16 38 0t36-6t36 4t36-4"/><path d="M-62 46q16-16 32-2t30-4t30 2"/><path d="M-26-84q8 26-8 46"/><path d="M28-86q-12 28 6 50"/><path d="M80-62q-18 14-10 36"/><path d="M-70-58q14 6 20 22"/></g>
+<path d="M60 62q30 6 44-10q8 22-14 36q-20 10-36-4z" fill="#14424b" stroke="#8ee8f4" stroke-width="2.5"/>
+<path d="M46 74q4 26-8 44" stroke="#8ee8f4" stroke-width="5" fill="none" stroke-linecap="round"/>
+</g>
+<g id="eyeG"><path d="M-70 0Q0-60 70 0Q0 60-70 0Z" fill="#0d2a31" stroke="#ffc94d" stroke-width="4"/><circle r="29" fill="url(#iris)"/><circle r="13" fill="#081013"/><circle cx="-9" cy="-10" r="5" fill="#fff"/></g>
+<g id="gateG"><rect x="-44" y="-7" width="88" height="14" rx="7" fill="#4ee0a6"/><g fill="#081013" opacity=".35"><rect x="-30" y="-7" width="8" height="14"/><rect x="-6" y="-7" width="8" height="14"/><rect x="18" y="-7" width="8" height="14"/></g><rect x="-52" y="-16" width="10" height="32" rx="4" fill="#2fb383"/><rect x="42" y="-16" width="10" height="32" rx="4" fill="#2fb383"/></g>
+</defs>
+
+<g class="el" data-el="star">
+<circle cx="70" cy="305" r="50" fill="url(#sglow)"><animate attributeName="r" values="40;58;40" dur="3s" repeatCount="indefinite"/></circle>
+<path transform="translate(70 307) scale(.68)" d="M0-44L12-14L44-12L19 8L28 40L0 22L-28 40L-19 8L-44-12L-12-14Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+<text x="70" y="367" text-anchor="middle" font-size="18" fill="#fff">الدافع</text>
+<text x="70" y="389" text-anchor="middle" font-size="18" fill="#fff">الفطري</text>
+</g>
+
+<g class="el" data-el="beam">
+<g class="flow">
+<use href="#beam" fill="none" stroke="#ffc94d" stroke-width="22" opacity=".14" stroke-linecap="round"/>
+<g class="motion" fill="#ffc94d">
+<circle r="6"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></circle>
+<circle r="4"><animateMotion dur="1.8s" begin="-.6s" repeatCount="indefinite"><mpath href="#beam2"/></animateMotion></circle>
+<g><path d="M-6-7L8 0L-6 7Z"/><animateMotion dur="1.8s" begin="-1.2s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></g>
+<g><text font-size="18" text-anchor="middle" y="6" style="stroke:none">♪</text><animateMotion dur="1.8s" begin="-.3s" repeatCount="indefinite"><mpath href="#beam2"/></animateMotion></g>
+</g>
+<g id="feedG" class="motion"></g>
+</g>
+</g>
+
+<g class="el" data-el="eye">
+<use href="#eyeG" transform="translate(250 82)"/>
+<g stroke="#ffc94d" stroke-width="4" stroke-linecap="round"><path d="M206 54l-9-14"/><path d="M234 44l-3-16"/><path d="M266 44l3-16"/><path d="M294 54l9-14"/></g>
+<g transform="translate(250 82)"><path class="lid" d="M-70 0Q0-60 70 0Q0 60-70 0Z" fill="#2a2208" stroke="#ffc94d" stroke-width="4"/></g>
+<text x="110" y="88" text-anchor="middle" font-size="24" fill="#ffc94d">العين</text>
+<text x="110" y="112" text-anchor="middle" font-size="15" fill="#d7c58e">المدخلات</text>
+</g>
+
+<g class="el" data-el="brain">
+<circle class="bgl" cx="255" cy="305" r="128" fill="url(#bglow)" opacity=".55"/>
+<circle class="pgl" cx="255" cy="305" r="135" fill="url(#rglow)" opacity="0"/>
+<g class="brainG"><use href="#brain" transform="translate(255 305) scale(.85)"/></g>
+<g id="sparkG"></g>
+<text x="388" y="311" text-anchor="middle" font-size="21" fill="#8ee8f4">الخيال</text>
+</g>
+
+<g class="el" data-el="orbit">
+<use href="#o1" stroke="#fff" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".55"/>
+<use href="#o2" stroke="#8ee8f4" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".55"/>
+<g id="orbG" class="motion"></g>
+</g>
+
+<g class="el" data-el="arrow"><line x1="255" y1="410" x2="255" y2="452" stroke="#f1f5f2" stroke-width="3" marker-end="url(#aw)"/></g>
+
+<g class="el" data-el="dline">
+<line x1="60" x2="400" y1="481" y2="481" stroke="#ff7a7a" stroke-width="2.5" stroke-dasharray="7 7"/>
+<text x="150" y="473" text-anchor="middle" font-size="14" fill="#ff7a7a">خط السقوط</text>
+</g>
+
+<g class="el" data-el="wave">
+<path id="wFill" fill="url(#wv)"/>
+<path id="wLine" fill="none" stroke="#4aa8e8" stroke-width="3" stroke-linejoin="round"/>
+<text x="230" y="574" text-anchor="middle" font-size="18" fill="#4aa8e8">الموجة</text>
+<g class="wmk" id="wMark" opacity="0"><line id="wmL" stroke-width="2" stroke-dasharray="4 5"/><circle id="wmC" r="9" stroke="#061014" stroke-width="3"/><text id="wmT" text-anchor="middle" font-size="17"></text></g>
+</g>
+
+<g class="el" data-el="fallG"><line x1="225" y1="586" x2="182" y2="628" stroke="#ff7a7a" stroke-width="3" marker-end="url(#ar)"/><text x="158" y="657" text-anchor="middle" font-size="19" fill="#ff7a7a">مع آخرين ✕</text></g>
+<g class="el" data-el="fallS"><line x1="285" y1="586" x2="328" y2="628" stroke="#ff7a7a" stroke-width="3" marker-end="url(#ar)"/><text x="350" y="657" text-anchor="middle" font-size="19" fill="#ff7a7a">فردي ✕</text></g>
+
+<g class="el" data-el="fallY"><line x1="255" y1="586" x2="255" y2="628" stroke="#ff7a7a" stroke-width="3" marker-end="url(#ar)"/><text x="255" y="657" text-anchor="middle" font-size="19" fill="#ff7a7a">النزول ✕</text></g>
+<g class="el" data-el="g1"><use href="#gateG" transform="translate(252 165)"/><g class="badge"><circle cx="322" cy="165" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="322" y="172" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">١</text></g><text x="380" y="171" text-anchor="middle" font-size="16" fill="#4ee0a6">غضّ البصر</text></g>
+<g class="el" data-el="g2"><use href="#gateG" transform="translate(255 431)"/><g class="badge"><circle cx="323" cy="431" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="323" y="438" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">٢</text></g><text x="380" y="437" text-anchor="middle" font-size="16" fill="#4ee0a6">العزيمة</text></g>
+<g class="el" data-el="g3"><path d="M200 712C70 712 20 680 20 560S24 430 46 404" fill="none" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#am)"/><use href="#gateG" transform="translate(255 712)"/><g class="badge"><circle cx="323" cy="712" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="323" y="719" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">٣</text></g><text x="255" y="758" text-anchor="middle" font-size="18" fill="#4ee0a6">التوبة: بداية جديدة</text></g>
+</svg>
+
+<div class="alt" data-v="drops"><div class="dropsV">
+<div class="dropGL" id="dropGL">
+<div class="dropFall" aria-hidden="true">
+<svg viewBox="0 0 160 150"><g stroke="#5d7a85" stroke-width="2.5"><path d="M0 80H160M0 100H160M0 120H160"/></g><path d="M80 34C94 60 112 76 112 100A32 32 0 0 1 48 100C48 76 66 60 80 34Z" fill="#dff3ff" fill-opacity=".22" stroke="#e6f6ff" stroke-width="1.6"/><path d="M64 82Q58 94 60 104" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M78 0Q76 18 80 34" stroke="#cfeaff" stroke-width="2.5" fill="none"/></svg>
+<svg viewBox="0 0 160 150"><g stroke="#5d7a85" stroke-width="2.5"><path d="M0 80H160M0 100H160M0 120H160"/></g><path d="M80 38C94 62 116 78 116 102A36 34 0 0 1 44 102C44 78 66 62 80 38Z" fill="#dcd8cc" fill-opacity=".92"/><path d="M62 86Q57 96 59 106" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".7"/></svg>
+<svg viewBox="0 0 160 150"><g stroke="#5d7a85" stroke-width="2.5"><path d="M0 80H160M0 100H160M0 120H160"/></g><path d="M80 44C98 58 126 76 124 104C122 124 102 132 80 132C56 132 36 124 36 106C36 82 60 60 80 44Z" fill="#f6f1e0"/><path d="M56 84Q50 96 52 108" stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none"/></svg>
+</div>
+</div>
+<div class="dropNames" role="group" aria-label="اختر قطرة"><button data-d="mathy">المَذْي</button><button data-d="wadi">الوَدْي</button><button data-d="mani">المَنِيّ</button></div>
+</div></div>
+
+<div class="alt" data-v="fitra"><svg id="fitSvg" viewBox="0 0 400 250" role="img" aria-label="طريق يبتعد تدريجيًا عن خط الفطرة السليمة"></svg></div>
+<div class="alt" data-v="balance"><svg viewBox="0 0 400 270" role="img" aria-label="ميزان: ذنبان أثقل من ذنب واحد">
+<g stroke="#e9eef5" stroke-width="4" fill="none" stroke-linecap="round"><path d="M200 44V226"/><path d="M150 230H250"/><path d="M73 87L327 33"/><path d="M73 87L43 147M73 87L103 147"/><path d="M327 33L297 93M327 33L357 93"/></g>
+<circle cx="200" cy="58" r="8" fill="#e9eef5"/>
+<path d="M33 147Q73 175 113 147Z" fill="#e9eef5" opacity=".9"/><path d="M287 93Q327 121 367 93Z" fill="#e9eef5" opacity=".9"/>
+<rect x="45" y="105" width="56" height="20" rx="5" fill="#ffb347"/><rect x="45" y="127" width="56" height="20" rx="5" fill="#ff7a7a"/>
+<rect x="299" y="73" width="56" height="20" rx="5" fill="#ff7a7a"/>
+<text x="73" y="196" text-anchor="middle" font-size="20" fill="#ff7a7a">ذنبان</text><text x="73" y="220" text-anchor="middle" font-size="14" fill="#c9d3dc">مشاهدة ثم نزول</text>
+<text x="327" y="142" text-anchor="middle" font-size="20" fill="#ffb347">أخف</text><text x="327" y="166" text-anchor="middle" font-size="14" fill="#c9d3dc">دون مشاهدة</text>
+</svg></div>
+
+<div class="alt" data-v="split"><svg viewBox="0 0 400 260" role="img" aria-label="استر ذنبك، وأخبر عن الأذى">
+<line x1="200" y1="30" x2="200" y2="230" stroke="rgba(255,255,255,.2)" stroke-width="2" stroke-dasharray="6 8"/>
+<path d="M300 46L352 64V110Q352 160 300 184Q248 160 248 110V64Z" fill="rgba(54,194,214,.12)" stroke="#36c2d6" stroke-width="4"/>
+<rect x="283" y="108" width="34" height="28" rx="5" fill="#36c2d6"/><path d="M290 108V98a10 10 0 0 1 20 0V108" fill="none" stroke="#36c2d6" stroke-width="4"/>
+<text x="300" y="222" text-anchor="middle" font-size="19" fill="#36c2d6">ذنبك: استره</text>
+<path d="M38 62H162A16 16 0 0 1 178 78V136A16 16 0 0 1 162 152H86L62 176V152H38A16 16 0 0 1 22 136V78A16 16 0 0 1 38 62Z" fill="rgba(255,122,122,.12)" stroke="#ff7a7a" stroke-width="4"/>
+<path d="M100 82V120" stroke="#ff7a7a" stroke-width="8" stroke-linecap="round"/><circle cx="100" cy="137" r="5" fill="#ff7a7a"/>
+<text x="100" y="222" text-anchor="middle" font-size="19" fill="#ff7a7a">أذى من غيرك: أخبر</text>
+</svg></div>
+
+<div class="alt" data-v="phone"><svg viewBox="0 0 400 260" role="img" aria-label="هاتف فيه رسالة تهديد، ودرع حماية">
+<rect x="145" y="22" width="110" height="214" rx="18" fill="rgba(255,255,255,.04)" stroke="#c9d3dc" stroke-width="4"/>
+<rect x="160" y="52" width="66" height="22" rx="11" fill="rgba(255,255,255,.25)"/>
+<rect x="174" y="84" width="66" height="22" rx="11" fill="#ff7a7a"/>
+<rect x="160" y="116" width="54" height="22" rx="11" fill="rgba(255,255,255,.25)"/>
+<path d="M200 150L224 192H176Z" fill="none" stroke="#ffc94d" stroke-width="4" stroke-linejoin="round"/><path d="M200 164V178" stroke="#ffc94d" stroke-width="4" stroke-linecap="round"/>
+<path d="M286 150L318 162V190Q318 220 286 234Q254 220 254 190V162Z" fill="#0b1a14" stroke="#4ee0a6" stroke-width="4"/><path d="M272 192L283 203L302 182" fill="none" stroke="#4ee0a6" stroke-width="5" stroke-linecap="round"/>
+</svg></div>
+
+<div class="alt" data-v="house"><svg viewBox="0 0 400 260" role="img" aria-label="بيت، وفقاعة كلام فيها علامة تنبيه">
+<path d="M90 130L180 56L270 130V228H90Z" fill="rgba(255,255,255,.04)" stroke="#c9d3dc" stroke-width="4" stroke-linejoin="round"/>
+<rect x="164" y="170" width="32" height="58" rx="4" fill="none" stroke="#c9d3dc" stroke-width="4"/>
+<rect x="112" y="140" width="36" height="30" rx="4" fill="none" stroke="#c9d3dc" stroke-width="3"/>
+<path d="M262 40H354A14 14 0 0 1 368 54V100A14 14 0 0 1 354 114H306L288 132V114H262A14 14 0 0 1 248 100V54A14 14 0 0 1 262 40Z" fill="rgba(255,122,122,.14)" stroke="#ff7a7a" stroke-width="4"/>
+<path d="M308 56V86" stroke="#ff7a7a" stroke-width="7" stroke-linecap="round"/><circle cx="308" cy="100" r="4.5" fill="#ff7a7a"/>
+</svg></div>
+
+<div class="alt" data-v="chat"><svg viewBox="0 0 400 260" role="img" aria-label="رسالة فيها مقطع مرفوض، ورد بالرفض">
+<rect x="150" y="36" width="200" height="86" rx="22" fill="rgba(255,255,255,.08)" stroke="#c9d3dc" stroke-width="3"/>
+<path d="M238 62L270 80L238 98Z" fill="#c9d3dc"/>
+<circle cx="252" cy="80" r="34" fill="none" stroke="#ff7a7a" stroke-width="6"/><path d="M228 104L276 56" stroke="#ff7a7a" stroke-width="6"/>
+<rect x="50" y="146" width="190" height="64" rx="22" fill="rgba(78,224,166,.14)" stroke="#4ee0a6" stroke-width="3"/>
+<text x="145" y="186" text-anchor="middle" font-size="22" fill="#4ee0a6">لا، شكرًا</text>
+</svg></div>
+
+<div class="banner" id="banner"><small id="bnK"></small><b id="bnT"></b></div>
+</div>
+
+<div class="side">
+<section class="card" id="card" aria-live="polite"></section>
+<footer class="act">
+<div class="hint" id="hint"></div>
+<div class="btns">
+<button id="back" aria-label="رجوع"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+<button id="primary">ابدأ الرحلة</button>
+</div>
+</footer>
+</div>
+</main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="القائمة">
+<header><h3>القائمة</h3><button class="icon" id="closeSheet" aria-label="إغلاق">✕</button></header>
+<div class="row"><span>المسار</span><div class="seg" role="radiogroup" aria-label="المسار"><button role="radio" data-t="y">١٣ إلى ١٥</button><button role="radio" data-t="o">١٦ فما فوق</button></div></div>
+<div class="row"><span>وضع الشرح<br><small class="priv">للمرشد أمام مجموعة: خط أكبر، والأسئلة للنقاش</small></span><button class="sw" id="pmSw" role="switch" aria-checked="false" aria-label="وضع الشرح"></button></div>
+<div id="stList"></div>
+<button class="restart" id="restart">ابدأ الرحلة من جديد</button>
+</aside>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const ar=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const map=$('map'),visual=$('visual'),card=$('card'),primary=$('primary'),back=$('back'),hint=$('hint');
+const handSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v14M6 12l6 6 6-6"/></svg>';
+const upSVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V6M6 12l6-6 6 6"/></svg>';
+
+/* ---------- chapters ---------- */
+const CH=[{n:'البداية',bg:'#0b1216',ac:'#ffd27a'},{n:'كيف تعمل الشهوة',bg:'#06171c',ac:'#36c2d6'},{n:'السقوط',bg:'#180a0c',ac:'#ff8a8a'},{n:'البوابات',bg:'#06160f',ac:'#4ee0a6'},{n:'احمِ نفسك',bg:'#0a1120',ac:'#8ab8ff'},{n:'الخاتمة',bg:'#0c1918',ac:'#ffc94d'}];
+
+/* ---------- questions ---------- */
+const Q={
+doubt:{q:'بعد تفكير، وجدت بللًا ولا تدري: أهو مذي أم مني؟ ماذا تفعل؟',o:[['أغتسل احتياطًا كلما شككت',0,'الاغتسال مع كل شك يفتح باب الوسوسة؛ الأصل أن تميّز بالعلامات.'],['أتذكّر العلامات: هل خرج بدفق ولذة؟ وهل شعرت بعده بفتور؟ وهل هو ثَخين كالعجين، ورائحته كرائحة العجين؟',1,'صحيح. إن وُجدت هذه العلامات فهو مني يوجب الغسل. وإن لم يحدث دفق ولا فتور، وكان رقيقًا لزجًا، فهو مذي: تغسل المكان وتتوضأ.'],['أعتبره منيًا، وأحكم على نفسي بالسقوط',0,'لا تحكم على نفسك دون علامة؛ خروج المذي ليس نزولًا، والشك لا يُبنى عليه.']]},
+when:{q:'متى تكون المقاومة أسهل؟',o:[['عند الذروة، لأنني أشعر بالخطر',0,'الذروة أصعب لحظة، والضغط فيها في أعلى درجاته.'],['في بدايتها، عند أول علامة',1,'صحيح. ولهذا أهم مهارة أن تنتبه متى تبدأ الموجة، فتفعّل حالة الطوارئ قبل أن تعلو. كثير من الناس لا يميّز البداية، فيجد نفسه واقعًا في الذنب ولا يدري متى بدأ الأمر.'],['بعد أن تهبط',0,'بعد الهبوط لا مقاومة أصلًا؛ المهم أن تصل إليه دون سقوط.']]},
+fluid:{q:'خرج منك سائل شفاف لَزِج بعد تفكير، دون دَفْق ولا لذّة كاملة. ما هو، وما حكمه؟',o:[['مني، ويجب الغسل',0,'المني يخرج بدفق ولذة ويعقبه فتور، وهذا لم يحدث.'],[()=>tr==='y'?'مذي: يُغسل مكانه ويُتوضأ، ولا يُعدّ نزولًا':'مذي: يُغسل مكانه ويُتوضأ، وليس استمناءً',1,'صحيح. فلا تحكم على نفسك بالسقوط، ولا تجعله بابًا لليأس أو الوسوسة. وإن كان سبب الإثارة نظرًا محرمًا، فالذنب في النظر وحده، وتكفيه التوبة.'],['لا شيء عليّ إطلاقًا',0,'المذي نجس: يُغسل مكانه، ويجب الوضوء للصلاة.']]},
+g1:{q:'ظهر لك مقطع فيه تلميحات وأنت تتصفح. ماذا تفعل؟',o:[['أكمل قليلًا لأرى',0,'تلك الثواني القليلة هي التي تُدخل الوقود إلى الخيال.'],['أتجاوزه فورًا، وأبتعد عن المصدر الذي أظهره',1,'صحيح: غضّ البصر من أول لحظة، وهي أسهل بوابة.']]},
+g2:{q:'دخلت الفكرة رغم ذلك، وبدأت تتكرر وأنت وحدك. ماذا تفعل؟',o:[['أبقى مكاني حتى تذهب',0,'البقاء في الظرف نفسه يغذّيها؛ الوحدة نفسها محفز.'],['أفكر فيها قليلًا ثم أتوقف',0,'«قليلًا» هو الاسترسال نفسه، وكل لحظة فيه ترفع الضغط.'],['أقطعها، وأغيّر مكاني، وأشغل نفسي بشيء نافع',1,'صحيح: هذه هي العزيمة.']]},
+g3:{q:'وقعتَ في الذنب. ماذا تفعل الآن؟',o:[['أستسلم، فقد انتهيت',0,'هذا أخطر ما في السقوط؛ اليأس يعيدك إلى الحلقة.'],['أنتظر حتى أشعر أني أستحق التوبة',0,'التوبة لا تنتظر الاستحقاق؛ بابها مفتوح الآن.'],['أتوب وأبدأ من جديد، دون جلد للذات',1,'صحيح. التوبة تعيدك إلى أول الطريق أقوى.']]},
+sc0:{q:'شخص تعرّفت عليه عبر الإنترنت يهدّدك بنشر صور إن لم ترسل المزيد. ماذا تفعل؟',o:[['أرسل ما يطلب لينتهي الأمر',0,'المبتز لا يتوقف؛ كل ما ترسله يزيد سيطرته عليك.'],['أدفع له مالًا',0,'الدفع يفتح بابًا لطلبات أكثر.'],['أتوقف عن الرد، ولا أحذف المحادثة، وأخبر والديّ أو شخصًا أثق به فورًا',1,'صحيح. لا ترضخ ولا تدفع. وهناك جهات رسمية مختصة بالجرائم الإلكترونية تتعامل مع هذا بسرية.']]},
+sc1:{q:'أحد أقاربك يتصرّف معك تصرّفات غير مريحة، ويطلب أن يبقى الأمر سرًا بينكما. ماذا تفعل؟',o:[['أسكت حفاظًا على العائلة',0,'السكوت يحمي المؤذي ويتركك وحدك؛ العائلة تُحمى بالكلام لا بالصمت.'],['أواجهه وحدي',0,'المواجهة وحدك قد تعرّضك للخطر؛ لا تحمل هذا وحدك.'],['أخبر والديّ أو شخصًا راشدًا أثق به فورًا',1,'صحيح، ولن تُلام. وطلبُه الكتمانَ علامةُ خطرٍ بحد ذاتها.']]},
+sc2:{q:'صديق يرسل لك مقاطع ويقول: «الكل يشاهد، لا تكبّر الموضوع». ماذا تفعل؟',o:[['أشاهد كي لا أبدو مختلفًا',0,'هكذا تبدأ الحلقة: محفز يدخل من الباب.'],['أرفض بوضوح، وأبتعد عن هذا الجانب منه',1,'صحيح. والصحبة الصالحة من أقوى وسائل العلاج.']]}
+};
+
+/* ---------- map engine ---------- */
+const EL={};map.querySelectorAll('.el').forEach(g=>EL[g.dataset.el]=g);
+const ALL=Object.keys(EL);
+const mapK=a=>a&&(tr==='y'?[...new Set(a.flatMap(k=>k==='fallS'||k==='fallG'?['fallY']:[k]))]:a.filter(k=>k!=='fallY'));
+const setShow=(show,focus,ghost)=>{show=mapK(show);focus=mapK(focus);ALL.forEach(k=>{EL[k].classList.toggle('on',show.includes(k));EL[k].classList.toggle('f',!!focus&&focus.includes(k))});map.classList.toggle('focusing',!!(focus&&focus.length));map.classList.toggle('ghost',!!ghost)};
+/* camera: animate the viewBox along the road */
+let vb=[0,0,420,800],camA=null,camC=null;
+const aspect=()=>{const r=visual.getBoundingClientRect();return r.width/(r.height||1)||1};
+const rectFor=c=>{const r=visual.getBoundingClientRect(),a=r.width/(r.height||1)||1,minH=c[2],minW=c[3]||c[2]*1.15;let h=Math.max(minH,minW/a,(r.height||300)/1.75);h=Math.min(h,Math.max(minH,860));const w=h*a;return[c[0]-w/2,c[1]-h/2,w,h]};
+const setVB=v=>{vb=v;map.setAttribute('viewBox',v.map(x=>x.toFixed(2)).join(' '))};
+const cam=(c,instant)=>{camC=c;if(camA)cancelAnimationFrame(camA);if(instant||reduce){setVB(rectFor(c));return}
+const from=vb.slice(),t0=performance.now(),D=950;
+const step=now=>{const k=Math.min(1,(now-t0)/D),e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,to=rectFor(c);setVB(from.map((v,i)=>v+(to[i]-v)*e));if(k<1)camA=requestAnimationFrame(step);else camA=null};
+camA=requestAnimationFrame(step)};
+new ResizeObserver(()=>{if(camC&&!camA)setVB(rectFor(camC))}).observe(visual);
+/* eye */
+const shut=on=>map.classList.toggle('shut',on);
+const feedG=$('feedG');
+const feed=(n,dur,sc,col)=>{feedG.innerHTML=Array.from({length:n},(_,k)=>`<g><g transform="scale(${sc})"><rect x="-8" y="-11" width="16" height="22" rx="4" fill="${col}"/><path d="M-3-5L5 0L-3 5Z" fill="#1a1008"/></g><animateMotion dur="${dur}s" begin="-${(dur*k/n).toFixed(2)}s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></g>`).join('')};
+/* brain pressure */
+const SP=[[-60,-50],[40,-62],[-85,0],[85,-10],[-40,60],[50,55],[0,-80],[-90,-40],[90,40],[-70,75],[75,80],[0,90],[-20,-20],[30,15]];
+$('sparkG').innerHTML=SP.map((p,i)=>`<circle class="spk" cx="${255+p[0]}" cy="${305+p[1]}" r="6" fill="${i%3?'#8ee8f4':'#ffc94d'}" opacity="0"><animate attributeName="r" values="${3+i%3};${8+i%3*3};${3+i%3}" dur="${(1.2+i%4*.3).toFixed(1)}s" begin="-${(i*.2).toFixed(1)}s" repeatCount="indefinite"/></circle>`).join('');
+const spk=[...map.querySelectorAll('.spk')],bgl=map.querySelector('.bgl'),pgl=map.querySelector('.pgl');
+const pressure=p=>{const n=[0,3,6,10,14][p];spk.forEach((c,i)=>c.setAttribute('opacity',i<n?1:0));pgl.setAttribute('opacity',[0,.05,.2,.4,.65][p]);bgl.setAttribute('opacity',[.55,.7,.85,.95,1][p]);map.classList.toggle('sh1',p===3);map.classList.toggle('sh2',p===4)};
+/* orbit */
+const orbG=$('orbG');
+const orbit=dur=>{orbG.innerHTML=['o1','o2'].map((id,k)=>[0,1].map(j=>`<circle r="5" fill="${k?'#8ee8f4':'#fff'}"><animateMotion dur="${dur}s" begin="-${((j/2)*dur+k*dur/4).toFixed(2)}s" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`).join('')).join('')};
+/* wave */
+const N=140,WX0=60,WX1=400,WB=545,WH=80;let wCur=new Float32Array(N+1),wA=null;
+const fSingle=t=>.04+.72*Math.exp(-((t-.5)**2)/(2*.15**2));
+const fMulti=(n,h)=>t=>{let v=.04;const sd=.28/n;for(let k=0;k<n;k++){const c=(k+.5)/n,hh=h*(.82+.18*k/Math.max(1,n-1));v=Math.max(v,.04+hh*Math.exp(-((t-c)**2)/(2*sd*sd)))}return v};
+const fLevel=L=>t=>{let v=.04;for(let k=0;k<6;k++){const c=(k+.5)/6,hh=L/100*(.8+.2*Math.sin(k*1.9+.7)**2);v=Math.max(v,.04+hh*Math.exp(-((t-c)**2)/(2*.045*.045)))}return v};
+const wX=t=>WX1-t*(WX1-WX0),wY=v=>WB-v*WH;
+const drawW=()=>{let d='';for(let i=0;i<=N;i++)d+=(i?'L':'M')+wX(i/N).toFixed(1)+' '+wY(wCur[i]).toFixed(1);$('wLine').setAttribute('d',d);$('wFill').setAttribute('d',d+`L${WX0} ${WB}L${WX1} ${WB}Z`)};
+const waveTo=(fn,instant)=>{const tgt=Float32Array.from({length:N+1},(_,i)=>fn(i/N));if(wA)cancelAnimationFrame(wA);if(instant||reduce){wCur=tgt;drawW();return}
+const from=wCur.slice(),t0=performance.now();const st=now=>{const k=Math.min(1,(now-t0)/650),e=1-Math.pow(1-k,3);for(let i=0;i<=N;i++)wCur[i]=from[i]+(tgt[i]-from[i])*e;drawW();if(k<1)wA=requestAnimationFrame(st);else wA=null};wA=requestAnimationFrame(st)};
+const wAt=t=>{const f=t*N,i=Math.min(N-1,Math.floor(f)),r=f-i;return wCur[i]*(1-r)+wCur[i+1]*r};
+const wMark=$('wMark'),wmC=$('wmC'),wmL=$('wmL'),wmT=$('wmT');
+const WST=[['تبدأ','#4ee0a6'],['تعلو','#ffc94d'],['الذروة','#ff7a7a'],['تهبط','#36c2d6']];
+const stOf=t=>t<.3?0:t<.45?1:t<.6?2:3;
+const markAt=(t,label,col)=>{const x=wX(t),y=wY(wAt(t)),s=WST[stOf(t)];const c=col||s[1];wmC.setAttribute('cx',x);wmC.setAttribute('cy',y);wmC.setAttribute('fill',c);wmL.setAttribute('x1',x);wmL.setAttribute('x2',x);wmL.setAttribute('y1',y-12);wmL.setAttribute('y2',446);wmL.setAttribute('stroke',c);wmT.setAttribute('x',Math.max(40,Math.min(380,x)));wmT.setAttribute('y',438);wmT.setAttribute('fill',c);wmT.textContent=label||s[0];wMark.setAttribute('opacity',1)};
+let mA=null;
+const markLoop=()=>{const t0=performance.now();const f=now=>{const t=((now-t0)%6500)/6500;markAt(t);mA=requestAnimationFrame(f)};mA=requestAnimationFrame(f)};
+const markOff=()=>{if(mA)cancelAnimationFrame(mA);mA=null;wMark.setAttribute('opacity',0)};
+/* reset all live map states */
+const resetMap=()=>{shut(false);feed(0,1,1,'#ffc94d');pressure(0);orbit(3.2);markOff()};
+
+/* fitra drawing */
+const FN=[[350,150,'المعتاد'],[262,138,'أشد'],[176,104,'أغرب'],[92,52,'انتكاس الفطرة']];
+const fitDraw=n=>{const col=['#ffc94d','#ff9f43','#ff7a7a','#ff5d6c'];let path='M380 150',segs='';
+for(let k=1;k<=n;k++){const [x0,y0]=FN[k-1],[x1,y1]=FN[k];segs+=`<path d="M${x0} ${y0}C${(x0+x1)/2+10} ${y0} ${(x0+x1)/2+10} ${y1} ${x1} ${y1}" fill="none" stroke="${col[k]}" stroke-width="${5+k*1.5}" stroke-linecap="round"/>`}
+$('fitSvg').innerHTML=`<line x1="20" x2="385" y1="150" y2="150" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="8 8"/><text x="385" y="180" text-anchor="start" font-size="16" fill="#4ee0a6" style="direction:rtl">الفطرة السليمة</text>
+<line x1="380" x2="350" y1="150" y2="150" stroke="${col[0]}" stroke-width="5" stroke-linecap="round"/>${segs}
+${FN.slice(0,n+1).map(([x,y,t],k)=>`<circle cx="${x}" cy="${y}" r="${8+k*2}" fill="${col[k]}" stroke="#061014" stroke-width="3"/><text x="${x}" y="${k===3?y-22:y-18}" text-anchor="middle" font-size="${k===3?18:16}" fill="${col[k]}">${t}</text>`).join('')}
+${n>0?`<line x1="${FN[n][0]}" x2="${FN[n][0]}" y1="${FN[n][1]+14+n*2}" y2="146" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="3 5"/>`:''}`};
+/* ---------- ask helper ---------- */
+let pm=false;
+const ask=(root,key,done)=>{const d=Q[key];let fired=false;
+root.innerHTML=`<p class="lab">${pm?'سؤال للنقاش':'اختبر فهمك'}</p><p class="q">${d.q}</p><div class="opts wait">${d.o.map((o,j)=>`<button data-j="${j}">${typeof o[0]==='function'?o[0]():o[0]}</button>`).join('')}</div><div class="fbx"></div>${pm?'<button class="link reveal">اكشف الإجابة</button>':''}`;
+const ob=[...root.querySelectorAll('.opts button')],fbx=root.querySelector('.fbx'),good=d.o.find(x=>x[1]);
+const show=j=>{ob.forEach((b,k)=>{b.classList.remove('ok','no');if(d.o[k][1])b.classList.add('ok');else if(k===j)b.classList.add('no')});
+const o=j==null?good:d.o[j];fbx.innerHTML=`<div class="fb ${o[1]?'ok':'no'}"><b>${o[1]?'✓ صحيح':'✕ ليست الأفضل'}</b>${o[2]}${o[1]?'':`<br><span style="color:var(--mint)">الأصح: ${typeof good[0]==='function'?good[0]():good[0]}.</span>`}</div>`;
+reveal(fbx);
+if(!fired){fired=true;done&&done()}};
+ob.forEach((b,j)=>b.addEventListener('click',()=>show(j)));
+const rv=root.querySelector('.reveal');if(rv)rv.addEventListener('click',()=>show(null))};
+
+/* ---------- primary button ---------- */
+let pFn=null;
+const setP=(label,fn,o={})=>{primary.textContent=label;pFn=o.locked?null:fn;primary.classList.toggle('locked',!!o.locked);primary.classList.toggle('pulse',!!o.pulse&&!reduce);primary.setAttribute('aria-disabled',o.locked?'true':'false');hint.innerHTML=o.hint?`${o.locked?upSVG:handSVG}<span>${o.hint}</span>`:'';requestAnimationFrame(moreCheck)};
+const moreCheck=()=>card.classList.toggle('more',card.scrollHeight-card.scrollTop-card.clientHeight>8);
+card.addEventListener('scroll',moreCheck,{passive:true});new ResizeObserver(moreCheck).observe(card);
+const reveal=el=>{if(!el)return;setTimeout(()=>{const r=el.getBoundingClientRect(),c=card.getBoundingClientRect();let d=0;if(r.bottom>c.bottom-8)d=Math.min(r.bottom-c.bottom+16,r.top-c.top-8);else if(r.top<c.top)d=r.top-c.top-8;if(d)card.scrollBy({top:d,behavior:reduce?'auto':'smooth'});moreCheck()},80)};
+primary.addEventListener('click',()=>{if(pFn)pFn()});
+
+/* ---------- scenes ---------- */
+const FULL=[210,400,800,430];
+const MAPALL=['star','eye','beam','brain','orbit','arrow','wave','fallS','fallG','g1','g2','g3'];
+let tr='y',cur=0,seen=new Set(),leaveFns=[];
+const onLeave=f=>leaveFns.push(f);
+const NEXT=()=>go(cur+1,1);
+const nextP=(o={})=>setP('التالي ←',NEXT,o);
+const S=[
+{id:'welcome',ch:0,name:'البداية',vis:'map',h:'x',cam:FULL,show:MAPALL,ghost:1,
+ html:()=>`<p class="kicker">رحلة قصيرة · ١٠ دقائق تقريبًا</p><h1>اعرِفْ موجتَك</h1>
+<p>ستمشي خطوة خطوة في طريق الشهوة: من أين تبدأ، وما الذي يغذّيها، وكيف تكبر، وأين تستطيع أن توقفها.</p>
+<ol class="how"><li><i>١</i><span>الزر الأصفر في الأسفل يأخذك للخطوة التالية، ويكتب لك دائمًا ما عليك فعله.</span></li><li><i>٢</i><span>حين يُطلب منك تجربة شيء، جرّبه بنفسك، ثم تابع.</span></li><li><i>٣</i><span>للرجوع اضغط السهم بجانبه، ولرؤية كل المراحل افتح القائمة ☰ في الأعلى.</span></li></ol>
+<p class="priv">لا شيء مما تختاره هنا يُرسل أو يُحفظ.</p><div id="resumeBox"></div>`,
+ enter(){const sv=load();if(sv&&sv.id&&sv.id!=='welcome'&&sv.id!=='track'){const L=list(),k=L.findIndex(s=>s.id===sv.id);if(k>1){setP(`أكمل من حيث توقفت ←`,()=>go(k,1),{pulse:1,hint:`توقفت عند: ${L[k].name}`});$('resumeBox').innerHTML='<button class="link" id="fresh">أو ابدأ من البداية</button>';$('fresh').addEventListener('click',()=>go(1,1));return}}
+ setP('ابدأ الرحلة ←',NEXT,{pulse:1})}},
+{id:'track',ch:0,name:'عمرك',vis:'map',h:'s',cam:FULL,show:MAPALL,ghost:1,
+ html:()=>`<h2>قبل أن نبدأ: كم عمرك؟</h2><p>بعض التفاصيل تختلف بحسب العمر.</p><div class="pick2"><button data-t="y">من ١٣ إلى ١٥ سنة</button><button data-t="o">١٦ سنة فما فوق</button></div>`,
+ enter(){const bs=[...card.querySelectorAll('.pick2 button')];const mark=()=>bs.forEach(b=>b.classList.toggle('on',b.dataset.t===tr&&picked));let picked=!!load()?.picked;mark();
+ setP(picked?'التالي ←':'اختر عمرك',NEXT,{locked:!picked,hint:picked?'':'اضغط على عمرك في الأعلى'});
+ bs.forEach(b=>b.addEventListener('click',()=>{tr=b.dataset.t;picked=true;mark();save(true);buildProg();nextP({pulse:1});setTimeout(()=>{if(S[curIdx()]?.id==='track')NEXT()},550)}))}},
+
+{id:'star',ch:1,name:'الدافع الفطري',vis:'map',h:'n',cam:[130,312,290],show:['star'],
+ html:()=>`<h2>الشَّرارة: الدافع الفِطري</h2><p>الشهوة دافع خلقه الله في كل إنسان. يأتي ويذهب، ولا يمكن إيقافه.</p><p class="call">وجودها ليس عيبًا فيك. السؤال المهم: ماذا تفعل حين تأتي؟</p>`,
+ enter(){nextP()}},
+{id:'brain',ch:1,name:'الخيال',vis:'map',h:'n',cam:[262,300,285],show:['star','brain'],focus:['brain'],
+ html:()=>`<h2>المصنع: الخيال</h2><p>حين يأتي الدافع، يبدأ العقلُ بتوليد الصور والأفكار. وكلما استرسلت مع الفكرة، ارتفع الضغط وصعب القطع.</p>
+<div class="meter" id="meter"><span></span><span></span><span></span><span></span><span></span></div><div class="mlab"><span>هدوء</span><span>تفكير</span><span>إلحاح</span><span>ضغط</span><span>حافة</span></div><div class="zone" id="zone"></div>`,
+ enter(){const Z=[['هدوء','#36c2d6','الدافع ساكن، والعقل مشغول بغيره.'],['بداية التفكير','#4ee0a6','بدأت الأفكار. هذه بداية الموجة: هنا تفعّل حالة الطوارئ.'],['إلحاح','#ffc94d','الأفكار تتكرر وتطلب المزيد. القطع ممكن لكنه أصعب.'],['ضغط شديد','#ff9f43','العقل والجسد يضغطان، والتفكير المنطقي يضعف.'],['حافة السقوط','#ff7a7a','أصعب لحظة: أي محفز صغير يكفي للسقوط.']];
+ let p=0;const paint=()=>{pressure(p);[...$('meter').children].forEach((s,i)=>s.style.background=i<=p&&p>0||i===0&&p===0?Z[Math.max(p,0)][1]:'');$('zone').innerHTML=`<b style="color:${Z[p][1]}">${Z[p][0]}</b>${Z[p][2]}`};paint();
+ const up=()=>{p++;paint();reveal($('zone'));if(p<4)setP(`استرسل في الفكرة (${ar(p+1)} من ٤)`,up,{hint:'استمر في الضغط ولاحظ الدماغ'});else setP('اقطع الفكرة',cut,{pulse:1,hint:'الآن جرّب العزيمة'})};
+ const cut=()=>{setP('…',null,{locked:1});let k=p;const t=setInterval(()=>{k--;p=k;paint();if(k<=0){clearInterval(t);$('zone').insertAdjacentHTML('afterend','<p class="call mint" id="zend">هذه هي العزيمة. ولو قطعتها عند «بداية التفكير» لكان القطع أسهل بكثير.</p>');reveal($('zend'));nextP({pulse:1})}},reduce?0:170);onLeave(()=>clearInterval(t))};
+ setP('استرسل في الفكرة (١ من ٤)',up,{pulse:1,hint:'جرّب بنفسك: اضغط الزر عدة مرات'})}},
+{id:'eye',ch:1,name:'العين',vis:'map',h:'n',cam:[250,200,380],show:['star','brain','eye','beam'],focus:['eye','beam','brain'],
+ html:()=>`<h2>الباب: العين، وكيف تغذّي الخيال</h2><p>الخيال لا يعمل وحده؛ وقوده الأكبر ما يدخل من العين: مقاطع، وصور، وأغانٍ، وكلام. انظر كيف تتدفّق إليه فتُشعله.</p><div id="after"></div>`,
+ enter(){pressure(2);setP('أغلق الباب',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين أُغلق الباب توقف الوقود، فهدأ الخيال. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+{id:'loop',ch:1,name:'كيف يصبح إدمانًا',vis:'map',h:'t',cam:[228,312,560],show:['star','eye','beam','brain','orbit','arrow','wave','dline'],
+ html:()=>`<h2>الحَلْقة: كيف يصبح إدمانًا؟</h2><p>الدافع يحرّك الخيال، والخيال يستدعي الدافع. أدخل محفزات من العين، ولاحظ الحلقة والموجات.</p><div class="status" id="lst" aria-live="polite"></div>`,
+ enter(){const L=[['البداية','دوران هادئ، وموجات قليلة ومتباعدة.',3.2,fMulti(2,.38),0,[0,1,1,'#ffc94d']],['دخل محفز','اشتعل الخيال، وعلت الموجة أكثر من طبيعتها.',2.1,fMulti(3,.6),1,[2,2.2,.85,'#ffc94d']],['التكرار','الحلقة أسرع: الدافع يعود أسرع وأقوى، والموجات تتقارب.',1.2,fMulti(6,.82),2,[3,1.5,1,'#ffc94d']],['التعوّد ثم الإدمان','المعتاد لم يعد يكفي، فيبحث عن الأغرب والأشد. والموجات تتجاوز خط السقوط باستمرار.',.65,fMulti(9,1.02),3,[5,.9,1.3,'#ff7a7a']]];
+ let l=0;const paint=()=>{const s=L[l];orbit(s[2]);waveTo(s[3]);pressure(s[4]);feed(...s[5]);$('lst').innerHTML=`<b>${s[0]}:</b> ${s[1]}`;if(l)reveal($('lst'))};waveTo(L[0][3],true);paint();
+ const add=()=>{l++;paint();if(l<3)setP(`أدخل محفزًا (${ar(l+1)} من ٣)`,add,{hint:'استمر، ولاحظ سرعة الحلقة وعلو الموجات'});else{$('lst').insertAdjacentHTML('afterend','<p class="call" id="lend">الإدمان يُبنى خطوة خطوة، ويُهدم بالطريقة نفسها: كل مرة تقطع فيها الحلقة تُضعفها.</p>');reveal($('lend'));nextP({pulse:1})}};
+ setP('أدخل محفزًا (١ من ٣)',add,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+{id:'fitra',ch:1,only:'o',name:'انتكاس الفطرة',vis:'fitra',h:'n',
+ html:()=>`<h2>التعوّد: انتِكاس الفِطرة</h2><p>مع كثرة التعوّد على المحفزات، لا يعود المعتاد يكفي، فيبحث الشخص عمّا هو أشد ثم أغرب. وكل خطوة تبعده أكثر عن الفطرة السليمة.</p><div class="status" id="fst" aria-live="polite"></div>`,
+ enter(){const T=['في البداية يكفيه القليل، وطريقه قريب من الفطرة.','المعتاد لم يعد يُثير كما كان، فيبحث عن الأشد.','حتى الأشد صار عاديًا، فينجرف إلى الأغرب.','وصل إلى ما كان يستنكره من قبل: انتكست الفطرة وانحرفت الميول.'];
+ let n=0;const paint=()=>{fitDraw(n);$('fst').innerHTML=T[n]};paint();
+ const more=()=>{n++;paint();reveal($('fst'));if(n<3)setP(`تعوّد أكثر (${ar(n+1)} من ٣)`,more,{hint:'استمر، ولاحظ ابتعاد الطريق عن الفطرة'});else{$('fst').insertAdjacentHTML('afterend','<p class="call mint" id="fend">وكما انحرف الطريق بالتدريج، يعود بالتدريج: كل مرة تترك فيها المحفز تقرّبك من الفطرة من جديد.</p>');reveal($('fend'));nextP({pulse:1})}};
+ setP('تعوّد أكثر (١ من ٣)',more,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+{id:'wave',ch:1,name:'الموجة',vis:'map',h:'s',cam:[230,505,215],show:['star','eye','beam','brain','orbit','arrow','wave'],focus:['wave'],
+ html:()=>`<h2>الموجة</h2><p>الشهوة تأتي كموجة: تبدأ، ثم تعلو، ثم تبلغ ذروتها، ثم تهبط وحدها إن لم تُغذَّ.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle);markLoop();onLeave(markOff);ask($('ask'),'when',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+
+{id:'fallY',ch:2,only:'y',name:'النزول',vis:'map',h:'n',cam:[252,585,240],show:['star','eye','beam','brain','orbit','arrow','wave','fallY'],focus:['fallY','wave'],
+ html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول.</p><p class="call">النزول هو خروج المَنِيّ.</p><p>وخروج المني في غير الزواج، أو في غير الاحتِلام أثناء النوم، غير صحيح ومحرّم، ويضرّك نفسيًا وذهنيًا.</p><p class="call warn">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>`,
+ enter(){waveTo(fSingle,true);nextP()}},
+{id:'fall',ch:2,only:'o',name:'النزول',vis:'map',h:'n',cam:[252,600,245],show:['star','eye','beam','brain','orbit','arrow','wave','fallS','fallG'],focus:['fallS','fallG','wave'],
+ html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول (خروج المني). والنزول طريقان، وكلاهما خطأ:</p><div class="two"><button data-p="S">فردي</button><button data-p="G">مع آخرين</button></div><div id="panes"></div>`,
+ enter(){waveTo(fSingle,true);const T={S:'<b>فردي (الاستمناء):</b> أضرار نفسية وذهنية: تعلّق وإدمان، وتشتّت التركيز، وشعور دائم بالذنب.',G:'<b>مع آخرين (الزنا أو اللواط):</b> كل ما سبق، ويُضاف إليه: الأمراض الجنسية المعدية، والفضيحة؛ فقد لا يرى الطرف الآخر في الأمر خطأً، أو ينقلب عليك، والابتزاز.'};
+ const got=new Set();const upd=()=>{if(got.size<2)setP(`اضغط الطريقين (${ar(got.size)} من ٢)`,null,{locked:1,hint:'اضغط «فردي» ثم «مع آخرين» في الأعلى'});else{if(!$('endC')){$('panes').insertAdjacentHTML('afterend','<p class="call warn" id="endC">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>');reveal($('endC'))}nextP({pulse:1})}};
+ card.querySelectorAll('.two button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.p;card.querySelectorAll('.two button').forEach(x=>x.classList.toggle('on',x===b));setShow(this.show,['fall'+k]);if(!got.has(k)){got.add(k);$('panes').insertAdjacentHTML('beforeend',`<div class="paneX">${T[k]}</div>`);reveal($('panes').lastElementChild)}upd()}));upd()}},
+{id:'double',ch:2,only:'o',name:'لا تجعل ذنبك ذنبين',vis:'balance',h:'n',
+ html:()=>`<h2>لا تجعل ذنبك ذنبين</h2><p>الذي يُطفئ الموجة هو النزول، لا المشاهدة. فالمشاهدة ذنب مستقل يزيد الضرر على الدماغ ويغذّي الحلقة. فمن غلبته الموجة، فلا يُضِفْ إليها ذنب المشاهدة.</p><p class="call warn">هذا تخفيف للضرر فقط، وليس الحل. الحل الجذري هو الترك.</p>`,
+ enter(){nextP()}},
+{id:'drops',ch:2,name:'السوائل الثلاثة',vis:'drops',h:'n',
+ html:()=>`<h2>ليس كل ما يخرج نزولًا</h2><p>قد يخرج سائل عند الإثارة، فيظن البعض أنه ${tr==='y'?'وقع في الذنب أو حصل منه النزول':'وقع في الاستمناء'}. تعرّف على السوائل الثلاثة.</p><div class="dinfo" id="dinfo"></div>`,
+ enter(){const D={mathy:['المَذْي','var(--cyan)','أبيض رقيق شفاف لَزِج، يمتدّ كالخيط. يخرج عند الإثارة أو التفكير أو النظر، بلا دَفْق ولا لذّة كاملة، وغالبًا لا يشعر به صاحبه.','يُغسل مكانه ويُتوضأ، ولا غسل فيه.',[72,22,78],'#9fd2ff'],wadi:['الوَدْي','#d9d5c9','أبيض كَدِر ثَخين، ليس لَزِجًا كالمذي. يخرج غالبًا بعد البول أو عند حمل شيء ثقيل، ولا علاقة له بالشهوة.','يُغسل مكانه ويُتوضأ، ولا غسل فيه.',[30,62,35],'#d9d5c9'],mani:['المَنِيّ','var(--coral)','أبيض ثَخين مُعتِم، قِوامه كالعجين، ورائحته كرائحة العجين. يخرج بدَفْق ولذّة، ويعقبه فُتور. وخروجه هو «النزول».','يوجب الغسل.',[6,92,85],'#ff9a9a']};
+ const got=new Set(),nb=[...document.querySelectorAll('.dropNames button')];
+ const sel=k=>{const d=D[k];got.add(k);nb.forEach(b=>{b.classList.toggle('on',b.dataset.d===k);b.classList.toggle('seen',got.has(b.dataset.d))});dispatchEvent(new CustomEvent('dropsel',{detail:k}));
+ $('dinfo').innerHTML=`<h3 style="color:${d[1]}">${d[0]}</h3><div class="meters"><div>الشفافية<i style="--v:${d[4][0]}%;--c:${d[5]}"></i></div><div>الثَّخانة<i style="--v:${d[4][1]}%;--c:${d[5]}"></i></div><div>اللُّزوجة<i style="--v:${d[4][2]}%;--c:${d[5]}"></i></div></div><p style="margin:0">${d[2]}</p><p class="rule">${d[3]}</p>`;
+ reveal($('dinfo'));if(got.size<3)setP(`المس القطرات (${ar(got.size)} من ٣)`,null,{locked:1,hint:'المس كل قطرة، أو اضغط اسمها في الصورة'});else nextP({pulse:1})};
+ nb.forEach(b=>b.classList.remove('on','seen'));
+ const h1=e=>sel(e.detail);addEventListener('droptap',h1);const h2=e=>{const b=e.target.closest('.dropNames button');if(b)sel(b.dataset.d)};document.querySelector('.dropNames').addEventListener('click',h2);
+ onLeave(()=>{removeEventListener('droptap',h1);document.querySelector('.dropNames').removeEventListener('click',h2)});
+ $('dinfo').innerHTML='<p class="call">المس كل قطرة لتراها تهتز، وتقرأ صفتها وحكمها.</p>';setP('المس القطرات (٠ من ٣)',null,{locked:1,hint:'المس كل قطرة، أو اضغط اسمها في الصورة'})}},
+{id:'fluidQ',ch:2,name:'اختبر: المذي',vis:'drops',h:'s',
+ html:()=>`<h2>اختبر فهمك</h2><div class="ask" id="ask"></div>`,
+ enter(){ask($('ask'),'fluid',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+
+{id:'doubt',ch:2,name:'موقف: شك',vis:'drops',h:'s',
+ html:()=>`<h2>موقف: شككت فيما خرج</h2><p>علامات المَنِيّ: يخرج <b>بدَفْق ولذّة</b>، ويعقبه <b>فُتور</b>، وهو <b>ثَخين كالعجين</b> ورائحته كرائحة العجين. فإن غابت هذه العلامات فهو غالبًا مذي.</p><div class="ask" id="ask"></div>`,
+ enter(){ask($('ask'),'doubt',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'gates',ch:3,name:'البوابات الثلاث',vis:'map',h:'t',cam:FULL,show:MAPALL,focus:['g1','g2','g3'],
+ html:()=>`<h2>ثلاث بوابات في الطريق</h2><p>على الطريق نفسه ثلاث بوابات، تستطيع عند أي منها أن توقف كل شيء. وكلما تدخّلت أبكر، كانت المقاومة أسهل.</p>`,
+ enter(){waveTo(fSingle,true);nextP()}},
+{id:'g1',ch:3,name:'البوابة ١: غضّ البصر',vis:'map',h:'s',cam:[262,135,250],show:MAPALL,focus:['g1','eye','beam'],
+ html:()=>`<h2>البوابة ١: غضّ البصر</h2><p>أغلق الباب من أوله: لا تنظر، ولا تفتح المقطع، وتجاوز ما يظهر لك.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle,true);ask($('ask'),'g1',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'g2',ch:3,name:'البوابة ٢: العزيمة',vis:'map',h:'s',cam:[262,395,290],show:MAPALL,focus:['g2','brain'],
+ html:()=>`<h2>البوابة ٢: العزيمة</h2><p>اقطع الفكرة في أولها، وغيّر مكانك، واشغل نفسك بما ينفع، واخرج من الوحدة.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle,true);ask($('ask'),'g2',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'g3',ch:3,name:'البوابة ٣: التوبة',vis:'map',h:'s',cam:[200,590,430],show:MAPALL,focus:['g3','fallS','fallG','star'],
+ html:()=>`<h2>البوابة ٣: التوبة</h2><p>إن وقعت فلا تيأس. التوبة ليست جلدًا للذات، بل بداية جديدة تعيدك إلى أول الطريق أقوى.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle,true);ask($('ask'),'g3',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'levels',ch:3,name:'ما يرفع وما يهدّئ',vis:'map',h:'s',cam:[230,498,230],show:['wave','dline','arrow','fallS','fallG'],focus:['wave','dline'],
+ html:()=>`<h2>ما يرفع الموجة، وما يهدّئها</h2><p>اضغط أي عنصر، وانظر أثره على الموجة. والعلاج يختلف من شخص لآخر.</p>
+<p class="grpT" style="color:var(--gold)">المحفزات: ترفعها</p><div class="chips up"><button data-v="14">النظر</button><button data-v="18">العلاقات المحرمة</button><button data-v="10">كثرة الكلام الجنسي</button><button data-v="14">الخلوة بغير الصالحين</button><button data-v="10">الفراغ</button><button data-v="10">الوحدة</button><button data-v="8">السهر</button><button data-v="12">الجوال في غرفة النوم</button></div>
+<p class="grpT" style="color:var(--mint)">وسائل العلاج: تهدّئها</p><div class="chips down"><button data-v="-14">غضّ البصر</button><button data-v="-12">العزيمة</button><button data-v="-10">الانشغال بما ينفع</button><button data-v="-10">القرآن</button><button data-v="-8">كثرة التوبة</button><button data-v="-12">الصحبة الصالحة</button><button data-v="-10">الصلاة الخاشعة</button><button data-v="-10">الصيام</button><button data-v="-12">الزواج لمن استطاع</button></div>`,
+ enter(){let L=45,n=0;waveTo(fLevel(L),true);card.querySelectorAll('.chips button').forEach(b=>b.addEventListener('click',()=>{L=Math.max(8,Math.min(108,L+ +b.dataset.v));waveTo(fLevel(L));n++;if(n===3)nextP({pulse:1})}));
+ setP('التالي ←',NEXT,{hint:'جرّب الضغط على العناصر، ثم تابع'})}},
+{id:'reflect',ch:3,name:'وقفة مع نفسك',vis:'map',h:'s',cam:[310,505,210],show:['wave','arrow'],focus:['wave'],
+ html:()=>`<h2>وقفة مع نفسك</h2><p>ما أول علامة تسبق الموجة عندك؟ اختر ما ينطبق عليك، بينك وبين نفسك.</p><div class="chips" id="signs">${['الوحدة','الملل','السهر','التوتر','الجوال في السرير','بعد مشاهدة شيء','الحزن','الفراغ'].map(x=>`<button aria-pressed="false">${x}</button>`).join('')}</div><p class="priv" style="margin-top:10px">لا يُحفظ شيء مما تختاره. معرفة علاماتك هي أول خطوة لتفعيل حالة الطوارئ في وقتها.</p>`,
+ enter(){waveTo(fSingle,true);markAt(.16,'هنا تبدأ','#4ee0a6');card.querySelectorAll('#signs button').forEach(b=>b.addEventListener('click',()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true')));nextP()}},
+
+{id:'tell',ch:4,name:'استر أم أخبر',vis:'split',h:'n',
+ html:()=>`<h2>متى تستر، ومتى تخبر؟</h2><div class="splitT"><div class="a"><b style="color:var(--cyan)">إن وقعتَ أنت في الذنب</b>استر نفسك، ولا تحكِ عنه للناس. لا تخبر به إلا من يساعدك فعلًا.</div><div class="b"><b style="color:var(--coral)">إن آذاك أحد، أو هدّدك، أو ابتزّك</b>أخبر والديك أو شخصًا راشدًا تثق به <b style="display:inline">فورًا</b>، ولن تُلام. السكوت هنا يحمي المؤذي، ولا يحميك.</div></div>`,
+ enter(){nextP()}},
+{id:'sc0',ch:4,name:'موقف: ابتزاز',vis:'phone',h:'s',
+ html:()=>`<h2>موقف: ابتزاز</h2><div class="ask" id="ask"></div>`,
+ enter(){ask($('ask'),'sc0',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'sc1',ch:4,name:'موقف: أحد الأقارب',vis:'house',h:'s',
+ html:()=>`<h2>موقف: أحد الأقارب</h2><p class="kicker">معظم حالات التحرش، أو تعليم هذه الأمور، تأتي من أشخاص يعرفهم الضحية، ومنهم الأقارب.</p><div class="ask" id="ask"></div>`,
+ enter(){ask($('ask'),'sc1',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'sc2',ch:4,name:'موقف: صديق يرسل مقاطع',vis:'chat',h:'s',
+ html:()=>`<h2>موقف: صديق يرسل مقاطع</h2><div class="ask" id="ask"></div><div id="after"></div>`,
+ enter(){ask($('ask'),'sc2',()=>{$('after').innerHTML='<p class="call">ومن تعرفه منخرطًا في هذه الأمور ووصل فيها مراحل بعيدة، أبعِدْه عن بيتك وأهلك، فلا تضمن كيف ينظر إليهم.</p>';reveal($('after'));nextP({pulse:1})});setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+
+{id:'end',ch:5,name:'الخاتمة',vis:'map',h:'t',cam:FULL,show:MAPALL,
+ html:()=>`<h2>الطريق كاملًا</h2><ul class="sum"><li><b style="color:var(--cyan)">الخيال</b> مصنع: الاسترسال يرفع الضغط.</li><li><b style="color:var(--gold)">العين</b> باب: ما يدخل منها وقود للخيال.</li><li><b style="color:var(--sea)">الموجة</b> تمرّ إن صبرت؛ انتبه لبدايتها.</li><li><b style="color:var(--mint)">البوابات:</b> غضّ البصر، والعزيمة، والتوبة.</li></ul><p class="call">باب التوبة مفتوح دائمًا، ومن سقط ثم قام فقد انتصر.</p><p class="priv" style="margin-top:10px">إن احتجت أن تتكلم، فاختر شخصًا تثق به، ولا تحمل الأمر وحدك.</p><button class="link" id="toMenu">راجع أي مرحلة من القائمة</button>`,
+ enter(){waveTo(fSingle,true);setP('ابدأ الرحلة من جديد',()=>go(0,-1));$('toMenu').addEventListener('click',openSheet)}}
+];
+const list=()=>S.filter(s=>!s.only||s.only===tr);
+const curIdx=()=>S.indexOf(list()[cur]);
+
+/* ---------- persistence ---------- */
+const load=()=>{try{return JSON.parse(localStorage.getItem('journeyV1')||'null')}catch(e){return null}};
+const save=picked=>{try{const o=load()||{};o.tr=tr;o.id=list()[cur]?.id;o.seen=[...seen];if(picked)o.picked=true;localStorage.setItem('journeyV1',JSON.stringify(o))}catch(e){}};
+{const sv=load();if(sv){if(sv.tr)tr=sv.tr;(sv.seen||[]).forEach(x=>seen.add(x))}}
+
+/* ---------- progress ---------- */
+const prog=$('prog');
+const buildProg=()=>{const L=list();prog.innerHTML=CH.slice(1).map((c,k)=>`<i style="flex:${L.filter(s=>s.ch===k+1).length}"><b></b></i>`).join('')};
+const paintProg=()=>{const L=list(),s=L[cur];[...prog.children].forEach((seg,k)=>{const ch=k+1,items=L.filter(x=>x.ch===ch),done=items.filter(x=>L.indexOf(x)<=cur).length;seg.firstChild.style.width=(s.ch>ch?100:s.ch===ch?done/items.length*100:0)+'%'})};
+
+/* ---------- navigation ---------- */
+let lastCh=-1,bnT=null;
+const go=(i,dir=1)=>{const L=list();i=Math.max(0,Math.min(i,L.length-1));leaveFns.forEach(f=>f());leaveFns=[];
+cur=i;const s=L[i];seen.add(s.id);
+const c=CH[s.ch];document.body.style.backgroundColor=c.bg;document.documentElement.style.setProperty('--ac',c.ac);document.documentElement.style.setProperty('--bg',c.bg);
+$('chName').textContent=s.ch?`${ar(s.ch)} · ${c.n}`:c.n;$('count').textContent=s.ch?`${ar(i+1)} / ${ar(L.length)}`:'';
+paintProg();
+visual.dataset.h=s.h||'n';
+const isMap=s.vis==='map';visual.classList.toggle('altOn',!isMap);document.querySelectorAll('.alt').forEach(a=>a.classList.toggle('on',a.dataset.v===s.vis));
+if(isMap){resetMap();setShow(s.show||[],s.focus,s.ghost);cam(s.cam||FULL,dir===0)}
+card.innerHTML=s.html();card.scrollTop=0;
+if(!reduce&&card.animate)card.animate([{opacity:0,transform:`translateX(${dir<0?28:-28}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)'});
+back.disabled=i===0;
+s.enter.call(s);
+if(s.ch!==lastCh&&s.ch>=1&&dir>0){$('bnK').textContent=`الفصل ${ar(s.ch)}`;$('bnT').textContent=c.n;const b=$('banner');b.classList.add('on');clearTimeout(bnT);bnT=setTimeout(()=>b.classList.remove('on'),1500)}
+lastCh=s.ch;save()};
+back.addEventListener('click',()=>{if(cur>0)go(cur-1,-1)});
+addEventListener('keydown',e=>{if(sheet.classList.contains('on')){if(e.key==='Escape')closeSheet();return}
+if(e.key==='ArrowLeft'&&pFn&&primary.textContent.startsWith('التالي'))pFn();if(e.key==='ArrowRight'&&cur>0)go(cur-1,-1)});
+
+/* ---------- menu ---------- */
+const sheet=$('sheet'),scrim=$('scrim');
+function openSheet(){buildList();sheet.classList.add('on');scrim.classList.add('on');$('menuBtn').setAttribute('aria-expanded','true');$('closeSheet').focus()}
+function closeSheet(){sheet.classList.remove('on');scrim.classList.remove('on');$('menuBtn').setAttribute('aria-expanded','false');$('menuBtn').focus()}
+$('menuBtn').addEventListener('click',openSheet);$('closeSheet').addEventListener('click',closeSheet);scrim.addEventListener('click',closeSheet);
+const buildList=()=>{const L=list();let h='';CH.forEach((c,k)=>{const items=L.filter(s=>s.ch===k);if(!items.length)return;h+=`<p class="chT">${k?`الفصل ${ar(k)} · `:''}${c.n}</p><div class="stL">`+items.map(s=>{const i=L.indexOf(s),ok=seen.has(s.id)||i<=cur+1;return`<button data-i="${i}" class="${i===cur?'cur':seen.has(s.id)?'seen':''}" ${ok?'':'disabled'}><span class="d"></span>${s.name}${ok?'':' 🔒'}</button>`}).join('')+'</div>'});
+$('stList').innerHTML=h;$('stList').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;closeSheet();go(i,i>=cur?1:-1)}));
+document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-checked',b.dataset.t===tr))};
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{if(tr===b.dataset.t)return;const id=list()[cur].id;tr=b.dataset.t;buildProg();const L=list();let k=L.findIndex(s=>s.id===id);if(k<0)k=Math.min(cur,L.length-1);cur=k;buildList();go(cur,0)}));
+const pmSw=$('pmSw');pmSw.addEventListener('click',()=>{pm=!pm;pmSw.setAttribute('aria-checked',pm);document.body.classList.toggle('pm',pm);go(cur,0)});
+$('restart').addEventListener('click',()=>{seen.clear();closeSheet();go(0,-1)});
+
+document.querySelector('.dropNames').addEventListener('click',e=>{const b=e.target.closest('button');if(b)dispatchEvent(new CustomEvent('dropsel',{detail:b.dataset.d}))});
+buildProg();go(0,0);
+}
+</script>
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
+{
+const box=document.getElementById('dropGL');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const D=Math.PI/180;
+try{
+const tex=(w,h,draw,rep)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep,rep)}return t};
+const radial=(a,b)=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');const gr=g.createRadialGradient(64,64,0,64,64,64);gr.addColorStop(0,a);gr.addColorStop(1,b);g.fillStyle=gr;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)};
+const capGeo=(R,thc,flat)=>{const pts=[new THREE.Vector2(0,0)],h0=R*Math.cos(thc),n=70;for(let i=0;i<=n;i++){const ph=thc*(1-i/n);pts.push(new THREE.Vector2(i===n?0:R*Math.sin(ph),(R*Math.cos(ph)-h0)*flat))}let g=new THREE.LatheGeometry(pts,100);g.deleteAttribute('normal');g.deleteAttribute('uv');g=mergeVertices(g);g.computeVertexNormals();return g};
+const threadGeo=L=>{const pts=[],n=80;for(let i=0;i<=n;i++){const y=i/n*L;const r=.02+.16*Math.exp(-y/.2)+.045*Math.exp(-(((y-L*.42)/.07)**2))+.05*Math.exp(-((L-y)/.25));pts.push(new THREE.Vector2(r,y))}let g=new THREE.LatheGeometry(pts,36);g.deleteAttribute('normal');g.deleteAttribute('uv');g=mergeVertices(g);g.computeVertexNormals();return g};
+const K={
+mathy:{x:1.95,R:.92,th:70,flat:.95,w:11,z:2,A:.17,idle:.01,mat:{color:0xffffff,transmission:.96,thickness:1.2,roughness:.035,ior:1.35,specularIntensity:1,clearcoat:1,clearcoatRoughness:.02,sheen:.1,sheenRoughness:.4,sheenColor:new THREE.Color(0xffffff),attenuationColor:new THREE.Color(0xe8ebe6),attenuationDistance:3.2,envMapIntensity:1.35},thread:true,caustic:.35},
+wadi:{x:0,R:.8,th:98,flat:.9,w:7.5,z:3.2,A:.13,idle:.008,mat:{color:0xe4e1d6,emissive:0x141310,transmission:.42,thickness:1.4,roughness:.3,ior:1.37,clearcoat:1,clearcoatRoughness:.08,sheen:.3,sheenRoughness:.7,sheenColor:new THREE.Color(0xd9d5c8),attenuationColor:new THREE.Color(0xcbc6b6),attenuationDistance:.45,envMapIntensity:1.1},caustic:.06},
+mani:{x:-1.95,R:.74,th:118,flat:.84,w:4.5,z:5.5,A:.08,idle:.005,mat:{color:0xfbf7ea,emissive:0x24221c,transmission:.06,thickness:.6,roughness:.26,ior:1.4,clearcoat:1,clearcoatRoughness:.05,sheen:.7,sheenRoughness:.5,sheenColor:new THREE.Color(0xfffdf3),envMapIntensity:1.15},lumpy:true,blob:true}
+};
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.3;renderer.outputColorSpace=THREE.SRGBColorSpace;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x1d2f35);
+const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),.03).texture;
+const cam=new THREE.PerspectiveCamera(26,1,.1,80);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(26,26),new THREE.MeshStandardMaterial({map:tex(512,512,(g,w,h)=>{g.fillStyle='#34505a';g.fillRect(0,0,w,h);for(let i=0;i<4000;i++){g.fillStyle=`rgba(255,255,255,${Math.random()*.035})`;g.fillRect(Math.random()*w,Math.random()*h,2,2)}g.fillStyle='#c3dbe1';for(let y=0;y<h;y+=64)g.fillRect(0,y+28,w,8)},7),roughness:.55,envMapIntensity:.55}));
+floor.rotation.x=-Math.PI/2;scene.add(floor);
+const back=new THREE.Mesh(new THREE.PlaneGeometry(40,14),new THREE.MeshBasicMaterial({map:tex(256,256,(g,w,h)=>{const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,'#2b4148');gr.addColorStop(1,'#1d2f35');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='rgba(140,175,185,.5)';for(let y=30;y<h;y+=46)g.fillRect(0,y,w,6)})}));back.position.set(0,4,-7);scene.add(back);
+const key=new THREE.DirectionalLight(0xffffff,1.6);key.position.set(-2.6,4.2,3);scene.add(key);
+const rim=new THREE.DirectionalLight(0xcfe8ff,.9);rim.position.set(1.5,2.2,-3.5);scene.add(rim);scene.add(new THREE.AmbientLight(0xffffff,.18));
+const drops={};
+for(const [name,k] of Object.entries(K)){
+const geo=capGeo(k.R,k.th*D,k.flat),pos=geo.attributes.position,base=pos.array.slice();let hMax=0,rMax=0;
+for(let i=0;i<pos.count;i++){hMax=Math.max(hMax,base[i*3+1]);rMax=Math.max(rMax,Math.hypot(base[i*3],base[i*3+2]))}
+const noise=new Float32Array(pos.count);
+if(k.lumpy)for(let i=0;i<pos.count;i++){const x=base[i*3],y=base[i*3+1],z=base[i*3+2],th=Math.atan2(z,x),yn=y/hMax,rw=(Math.hypot(x,z)/rMax)**2;noise[i]=(.07*Math.sin(3*th+1.3)+.045*Math.sin(5*th+.4+yn*2)+.03*Math.sin(7*th+2.1))*Math.min(1,yn*4)*rw}
+const mat=new THREE.MeshPhysicalMaterial(k.mat);const mesh=new THREE.Mesh(geo,mat);mesh.position.x=k.x;scene.add(mesh);
+const parts=[{geo,pos,base,hMax,noise}];
+if(k.blob){const g2=capGeo(.38,112*D,.82),p2=g2.attributes.position,b2=p2.array.slice();let h2=0;for(let i=1;i<b2.length;i+=3)h2=Math.max(h2,b2[i]);const m2=new THREE.Mesh(g2,mat);m2.position.set(k.x-.6,0,.3);scene.add(m2);parts.push({geo:g2,pos:p2,base:b2,hMax:h2,noise:new Float32Array(p2.count)})}
+let thread=null;if(k.thread){thread=new THREE.Mesh(threadGeo(4),mat);thread.position.set(k.x,hMax*.97,0);scene.add(thread)}
+const rad=k.R*Math.sin(Math.min(k.th,90)*D);
+const sh=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:radial('rgba(0,0,0,.75)','rgba(0,0,0,0)'),transparent:true,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.set(k.x+.12,.003,-.1);sh.scale.set(rad*3.1,rad*2.6,1);scene.add(sh);
+if(k.caustic){const ca=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:radial('rgba(255,252,235,1)','rgba(255,252,235,0)'),transparent:true,opacity:k.caustic,blending:THREE.AdditiveBlending,depthWrite:false}));ca.rotation.x=-Math.PI/2;ca.position.set(k.x+.32,.005,-.42);ca.scale.set(rad*1.3,rad*.9,1);scene.add(ca)}
+const ring=new THREE.Mesh(new THREE.RingGeometry(rad*1.18,rad*1.3,64),new THREE.MeshBasicMaterial({color:0x4ee0a6,transparent:true,opacity:0,depthWrite:false}));ring.rotation.x=-Math.PI/2;ring.position.set(k.x,.006,0);scene.add(ring);
+drops[name]={k,parts,thread,ring,kick:-99}}
+const cv=renderer.domElement;box.prepend(cv);
+let sel=null;
+const size=()=>{const W=box.clientWidth||300,H=box.clientHeight||200;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix()};
+new ResizeObserver(size).observe(box);size();
+const now=()=>performance.now()/1000;
+const kick=n=>{drops[n].kick=now()};
+cv.addEventListener('pointerdown',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width;const n=fx>.64?'mathy':fx>.36?'wadi':'mani';kick(n);dispatchEvent(new CustomEvent('droptap',{detail:n}))});
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+addEventListener('dropsel',e=>{sel=e.detail;kick(sel)});
+let vis=false,shown=false;const alt=box.closest('.alt');
+new IntersectionObserver(es=>{vis=es[0].isIntersecting}).observe(box);
+box.classList.add('gl');
+const deform=(d,t)=>{const k=d.k,tau=t-d.kick,on=tau>0&&tau<6;const j=on?k.A*Math.exp(-k.z*tau)*Math.sin(k.w*tau):0,sway=on?k.A*.55*Math.exp(-k.z*tau)*Math.sin(k.w*.8*tau+1.2):0;
+for(const p of d.parts){const b=p.base,a=p.pos;for(let i=0;i<a.count;i++){const x=b[i*3],y=b[i*3+1],z=b[i*3+2],yn=y/p.hMax;const s=j+k.idle*Math.sin(t*2.1+y*4)*yn,rf=(1+p.noise[i])*(1+.5*s*yn);a.setXYZ(i,x*rf+sway*yn*yn*p.hMax*.6,y*(1-s),z*rf)}a.needsUpdate=true;p.geo.computeVertexNormals()}
+if(d.thread){d.thread.position.y=d.parts[0].hMax*(1-j)*.97;d.thread.position.x=k.x+sway*d.parts[0].hMax*.6;d.thread.scale.set(1,1+.06*Math.sin(t*.9),1)}};
+const t0=now();
+const loop=()=>{requestAnimationFrame(loop);const on=vis&&alt.classList.contains('on');if(on&&!shown){const t=now();['mathy','wadi','mani'].forEach((n,i)=>drops[n].kick=t+.5+i*.45)}shown=on;if(!on)return;const t=now();
+for(const [n,d] of Object.entries(drops)){if(!reduce)deform(d,t);d.ring.material.opacity=n===sel?.55+.25*Math.sin(t*3):0}
+const a=cam.aspect,el=20*D,dist=Math.max(7.2,3.15/(Math.tan(13*D)*a)),az=reduce?0:.12*Math.sin((t-t0)*.3);
+cam.position.set(Math.sin(az)*dist*Math.cos(el),dist*Math.sin(el)+.3,Math.cos(az)*dist*Math.cos(el));cam.lookAt(0,.42,0);renderer.render(scene,cam)};
+loop();
+}catch(e){/* keep the drawn fallback */}
+}
+</script>
+</body>
+</html>
