@@ -154,6 +154,10 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 #map .lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);transition:transform .6s ease}
 #map.shut .lid{transform:scaleY(1)}
 #map .flow{transition:opacity .5s}
+#map .eyeO,#map .eyeC{transition:opacity .6s ease}
+#map .eyeC{opacity:0}
+#map.shut .eyeO{opacity:0}
+#map.shut .eyeC{opacity:1}
 #map.shut .flow{opacity:0}
 #map .bgl,#map .pgl,#map .spk{transition:opacity .4s}
 #map.sh1 .brainG{animation:shake .18s linear infinite}
@@ -265,7 +269,7 @@ body.pm #primary{font-size:22px}
 
 <g class="el" data-el="beam">
 <g class="flow">
-<use href="#beam" fill="none" stroke="#ffc94d" stroke-width="22" opacity=".14" stroke-linecap="round"/>
+<use href="#beam" fill="none" stroke="#ffc94d" stroke-width="2" stroke-dasharray="3 7" opacity=".55" stroke-linecap="round"/>
 <g class="motion" fill="#ffc94d">
 <circle r="6"><animateMotion dur="1.8s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></circle>
 <circle r="4"><animateMotion dur="1.8s" begin="-.6s" repeatCount="indefinite"><mpath href="#beam2"/></animateMotion></circle>
@@ -277,9 +281,7 @@ body.pm #primary{font-size:22px}
 </g>
 
 <g class="el" data-el="eye">
-<use href="#eyeG" transform="translate(250 82)"/>
-<g stroke="#ffc94d" stroke-width="4" stroke-linecap="round"><path d="M206 54l-9-14"/><path d="M234 44l-3-16"/><path d="M266 44l3-16"/><path d="M294 54l9-14"/></g>
-<g transform="translate(250 82)"><path class="lid" d="M-70 0Q0-60 70 0Q0 60-70 0Z" fill="#2a2208" stroke="#ffc94d" stroke-width="4"/></g>
+<g transform="translate(250 84) scale(1.3)"><g class="eyeO"><g transform="translate(-34 0)"><path d="M-28 0Q0-22 28 0Q0 22-28 0Z" fill="#0d2a31" stroke="#ffc94d" stroke-width="2.6" stroke-linejoin="round"/><circle cy="1" r="10" fill="url(#iris)"/><circle cy="1" r="4.5" fill="#081013"/><circle cx="-3.5" cy="-2.5" r="2" fill="#fff"/><path d="M-24-12Q0-29 24-12" fill="none" stroke="#ffc94d" stroke-width="1.6" opacity=".5" stroke-linecap="round"/></g><g transform="translate(34 0)"><path d="M-28 0Q0-22 28 0Q0 22-28 0Z" fill="#0d2a31" stroke="#ffc94d" stroke-width="2.6" stroke-linejoin="round"/><circle cy="1" r="10" fill="url(#iris)"/><circle cy="1" r="4.5" fill="#081013"/><circle cx="-3.5" cy="-2.5" r="2" fill="#fff"/><path d="M-24-12Q0-29 24-12" fill="none" stroke="#ffc94d" stroke-width="1.6" opacity=".5" stroke-linecap="round"/></g></g><g class="eyeC"><g transform="translate(-34 0)"><path d="M-28 0Q0 18 28 0" fill="none" stroke="#ffc94d" stroke-width="2.8" stroke-linecap="round"/><g stroke="#ffc94d" stroke-width="2" stroke-linecap="round"><path d="M-14 6.8l-4 6"/><path d="M0 9v7"/><path d="M14 6.8l4 6"/></g></g><g transform="translate(34 0)"><path d="M-28 0Q0 18 28 0" fill="none" stroke="#ffc94d" stroke-width="2.8" stroke-linecap="round"/><g stroke="#ffc94d" stroke-width="2" stroke-linecap="round"><path d="M-14 6.8l-4 6"/><path d="M0 9v7"/><path d="M14 6.8l4 6"/></g></g></g></g>
 <text x="110" y="88" text-anchor="middle" font-size="24" fill="#ffc94d">العين</text>
 <text x="110" y="112" text-anchor="middle" font-size="15" fill="#d7c58e">المدخلات</text>
 </g>
@@ -537,7 +539,7 @@ const S=[
  setP('استرسل في الفكرة (١ من ٤)',up,{pulse:1,hint:'جرّب بنفسك: اضغط الزر عدة مرات'})}},
 {id:'eye',ch:1,name:'العين',vis:'map',h:'n',cam:[250,200,380],show:['star','brain','eye','beam'],focus:['eye','beam','brain'],
  html:()=>`<h2>الباب: العين، وكيف تغذّي الخيال</h2><p>الخيال لا يعمل وحده؛ وقوده الأكبر ما يدخل من العين: مقاطع، وصور، وأغانٍ، وكلام. انظر كيف تتدفّق إليه فتُشعله.</p><div id="after"></div>`,
- enter(){pressure(2);setP('أغلق الباب',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين أُغلق الباب توقف الوقود، فهدأ الخيال. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+ enter(){pressure(2);setP('غُضَّ بصرك',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين غضضتَ بصرك توقّف الوقود، فهدأ الخيال. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
 {id:'loop',ch:1,name:'كيف يصبح إدمانًا',vis:'map',h:'t',cam:[228,312,560],show:['star','eye','beam','brain','orbit','arrow','wave','dline'],
  html:()=>`<h2>الحَلْقة: كيف يصبح إدمانًا؟</h2><p>الدافع يحرّك الخيال، والخيال يستدعي الدافع. أدخل محفزات من العين، ولاحظ الحلقة والموجات.</p><div class="status" id="lst" aria-live="polite"></div>`,
  enter(){const L=[['البداية','دوران هادئ، وموجات قليلة ومتباعدة.',3.2,fMulti(2,.38),0,[0,1,1,'#ffc94d']],['دخل محفز','اشتعل الخيال، وعلت الموجة أكثر من طبيعتها.',2.1,fMulti(3,.6),1,[2,2.2,.85,'#ffc94d']],['التكرار','الحلقة أسرع: الدافع يعود أسرع وأقوى، والموجات تتقارب.',1.2,fMulti(6,.82),2,[3,1.5,1,'#ffc94d']],['التعوّد ثم الإدمان','المعتاد لم يعد يكفي، فيبحث عن الأغرب والأشد. والموجات تتجاوز خط السقوط باستمرار.',.65,fMulti(9,1.02),3,[5,.9,1.3,'#ff7a7a']]];
