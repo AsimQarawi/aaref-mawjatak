@@ -587,7 +587,7 @@ const S=[
  html:()=>`<h2>قبل أن نبدأ: كم عمرك؟</h2><p>بعض التفاصيل تختلف بحسب العمر.</p><div class="pick2"><button data-t="y">من ١٣ إلى ١٥ سنة</button><button data-t="o">١٦ سنة فما فوق</button></div>`,
  enter(){const bs=[...card.querySelectorAll('.pick2 button')];const mark=()=>bs.forEach(b=>b.classList.toggle('on',b.dataset.t===tr&&picked));let picked=!!load()?.picked;mark();
  setP(picked?'التالي ←':'اختر عمرك',NEXT,{locked:!picked,hint:picked?'':'اضغط على عمرك في الأعلى'});
- bs.forEach(b=>b.addEventListener('click',()=>{tr=b.dataset.t;picked=true;mark();save(true);buildProg();nextP({pulse:1});setTimeout(()=>{if(S[curIdx()]?.id==='track')NEXT()},550)}))}},
+ bs.forEach(b=>b.addEventListener('click',()=>{tr=b.dataset.t;picked=true;mark();save(true);buildProg();nextP({pulse:1,hint:'اضغط «التالي» للمتابعة'})}))}},
 
 {id:'star',ch:1,name:'الدافع الفطري',vis:'map',h:'n',cam:[130,312,290],show:['star'],
  html:()=>`<h2>الشَّرارة: الدافع الفِطري</h2><p>الشهوة دافع خلقه الله في كل إنسان. يأتي ويذهب، ولا يمكن إيقافه.</p><p class="call">وجودها ليس عيبًا فيك. السؤال المهم: ماذا تفعل حين تأتي؟</p>`,
