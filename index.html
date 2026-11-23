@@ -24,15 +24,17 @@ body{background:var(--bg);color:var(--ink);font:17px/1.75 "IBM Plex Sans Arabic"
 h1,h2,h3{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:800;line-height:1.3;margin:0;text-wrap:balance}
 button{font-family:inherit}
 svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
-#app{height:100%;display:grid;grid-template-rows:auto auto minmax(0,1fr);max-width:1320px;margin:0 auto}
+#app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);max-width:1320px;margin:0 auto}
 /* header */
-.top{display:flex;align-items:center;gap:10px;padding:8px 12px 6px}
+.top{padding:8px 12px 0}
+.top .row{display:flex;align-items:center;gap:10px}
+.vband{display:none}
 .icon{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--edge);background:var(--glass);color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .icon:focus-visible,button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 .where{flex:1;display:flex;align-items:center;gap:8px}
 .where b{font:800 17px "Cairo",sans-serif;color:var(--ac);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .8s}
 .where span{margin-inline-start:auto;color:var(--muted);font-size:14px;white-space:nowrap}
-.prog{display:flex;gap:5px;padding:0 12px 10px}
+.prog{display:flex;gap:5px;padding:8px 0 10px}
 .prog i{display:block;height:5px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
 .prog i b{display:block;height:100%;width:0;background:var(--ac);border-radius:5px;transition:width .6s ease,background-color .8s}
 /* stage */
@@ -105,7 +107,7 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 /* drops */
 .dropsV{position:absolute;inset:0}
 .dropGL{position:absolute;inset:0}
-.dropGL canvas{position:absolute;inset:0;width:100%!important;height:100%!important;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.dropGL canvas{position:absolute;inset:0;width:100%!important;height:100%!important;object-fit:contain;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .dropFall{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;padding:10px 10px 56px}
 .dropGL.gl .dropFall{display:none}
 .dropFall svg{width:100%;height:auto;max-height:100%}
@@ -214,7 +216,33 @@ body.pm #primary{font-size:22px}
 .card>.grpT{margin-top:18px}
 .card>.grpT+.chips{margin-top:8px}
 .dinfo>*+*{margin-top:8px}
-@media(min-width:900px){
+@media (max-width:599px),(max-width:899px) and (orientation:portrait){
+html,body{height:auto;overflow:visible}
+html{overflow-x:hidden}
+#app{display:block;height:auto;overflow:visible}
+body{overflow-x:clip;font-size:16.5px;line-height:1.72}
+body.lock{overflow:hidden}
+.top{position:fixed;top:0;left:0;right:0;z-index:12;background:var(--bg);padding:calc(6px + env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) 0 max(12px,env(safe-area-inset-left));transition:background-color .9s ease}
+.icon{width:42px;height:42px;border-radius:12px}
+.where b{font-size:16px}
+.where span{font-size:13px}
+.prog{padding:7px 0 8px}
+.prog i{height:4px}
+.stage{display:block}
+.vband{display:block;position:fixed;left:0;right:0;top:var(--topH,60px);height:calc(var(--vis,240px) + 16px);z-index:9;pointer-events:none;background:linear-gradient(to bottom,var(--bg) calc(100% - 16px),transparent);transition:background-color .9s ease}
+.visual{position:fixed;z-index:10;top:var(--topH,60px);left:10px;right:10px;margin:0;height:var(--vis,240px)!important;transition:none;border-radius:20px;background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--ac) 13%,transparent),rgba(0,0,0,.28) 78%),var(--bg)}
+.side{display:block;overflow:hidden;padding-top:calc(var(--topH,60px) + var(--he,240px) + 4px)}
+.card{overflow:visible;padding:16px 18px calc(var(--actH,90px) + 26px)}
+.card.more{-webkit-mask-image:none;mask-image:none}
+.act{position:fixed;left:0;right:0;bottom:0;z-index:12;background:var(--bg);padding:6px 12px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -18px 22px -6px var(--bg);transition:background-color .9s ease}
+#back{width:52px;height:52px;border-radius:16px}
+#primary{min-height:52px;border-radius:16px;font-size:18px}
+.banner{padding:8px 20px}
+.banner b{font-size:19px}
+html.snap .visual,html.snap .vband{transition:height .45s cubic-bezier(.2,.7,.2,1)}
+html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
+}
+@media (min-width:900px),(min-width:600px) and (orientation:landscape){
 .stage{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px;padding:0 16px 16px}
 .visual{height:auto!important;margin:0}
 .side{border:1px solid var(--edge);border-radius:24px;background:rgba(255,255,255,.025);overflow:hidden}
@@ -222,17 +250,35 @@ body.pm #primary{font-size:22px}
 .sheet{inset-inline:auto 0;inset-inline-start:0;top:0;bottom:0;width:400px;max-height:none;border-radius:0;border-top:0;border-inline-end:1px solid var(--edge);transform:translateX(105%)}
 .sheet.on{transform:none}
 }
+@media (orientation:landscape) and (max-height:500px) and (min-width:600px){
+.top{padding:4px max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}
+.icon{width:38px;height:38px;border-radius:11px}
+.where b{font-size:15px}
+.prog{padding:5px 0 6px}
+.stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:0 max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left))}
+.card{padding:12px 16px 14px}
+.card h2{font-size:22px}
+.card h1{font-size:26px}
+.act{padding:6px 10px 8px}
+.hint{font-size:12.5px;margin-bottom:3px;min-height:16px}
+#back{width:44px;height:44px;border-radius:13px}
+#primary{min-height:44px;border-radius:13px;font-size:16px}
+.banner{padding:6px 16px}.banner b{font-size:17px}
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.motion{display:none}}
 </style>
 </head>
 <body>
 <div id="app">
 <header class="top">
+<div class="row">
 <button class="icon" id="menuBtn" aria-label="القائمة والمراحل" aria-controls="sheet" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 <div class="where"><b id="chName">البداية</b><span id="count"></span></div>
-</header>
+</div>
 <div class="prog" id="prog"></div>
+</header>
 <main class="stage">
+<div class="vband" aria-hidden="true"></div>
 <div class="visual" id="visual" data-h="s">
 
 <svg id="map" viewBox="0 0 420 800" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -437,8 +483,25 @@ const mapK=a=>a&&(tr==='y'?[...new Set(a.flatMap(k=>k==='fallS'||k==='fallG'?['f
 const setShow=(show,focus,ghost)=>{show=mapK(show);focus=mapK(focus);ALL.forEach(k=>{EL[k].classList.toggle('on',show.includes(k));EL[k].classList.toggle('f',!!focus&&focus.includes(k))});map.classList.toggle('focusing',!!(focus&&focus.length));map.classList.toggle('ghost',!!ghost)};
 /* camera: animate the viewBox along the road */
 let vb=[0,0,420,800],camA=null,camC=null;
+/* ---------- phone layout: the page scrolls, the picture stays and folds ---------- */
+const mq=matchMedia('(max-width:599px),(max-width:899px) and (orientation:portrait)');
+const rootS=document.documentElement.style;
+const topEl=document.querySelector('.top'),actEl=document.querySelector('.act');
+const HF={x:.22,s:.30,n:.37,t:.44};
+const VV=()=>window.visualViewport&&visualViewport.scale<1.05?visualViewport.height:innerHeight;
+let he=240,hc=140,collP=0,vhRef=VV(),wRef=innerWidth,curH='s',snapT=null;
+const measure=()=>{rootS.setProperty('--topH',topEl.offsetHeight+'px');rootS.setProperty('--actH',actEl.offsetHeight+'px')};
+const applyScroll=()=>{if(!mq.matches)return;const s=Math.max(0,scrollY),v=Math.max(hc,he-s);rootS.setProperty('--vis',v+'px');collP=he>hc?(he-v)/(he-hc):0};
+const layoutStep=(h,animate)=>{curH=h||'n';if(!mq.matches)return;measure();const vh=vhRef,avail=vh-topEl.offsetHeight-actEl.offsetHeight;
+he=Math.round(Math.max(150,Math.min(vh*(HF[curH]||.37),avail-210)));hc=Math.round(Math.min(he,Math.max(118,vh*.19)));
+if(animate&&!reduce){document.documentElement.classList.add('snap');clearTimeout(snapT);snapT=setTimeout(()=>document.documentElement.classList.remove('snap'),520)}
+rootS.setProperty('--he',he+'px');applyScroll()};
+let tick=false;addEventListener('scroll',()=>{if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;applyScroll()})},{passive:true});
+addEventListener('resize',()=>{measure();const h=VV();if(Math.abs(innerWidth-wRef)>40||Math.abs(h-vhRef)>160){wRef=innerWidth;vhRef=h;layoutStep(curH)}});
+if(mq.addEventListener)mq.addEventListener('change',()=>{vhRef=VV();layoutStep(curH)});
+new ResizeObserver(measure).observe(topEl);new ResizeObserver(measure).observe(actEl);measure();
 const aspect=()=>{const r=visual.getBoundingClientRect();return r.width/(r.height||1)||1};
-const rectFor=c=>{const r=visual.getBoundingClientRect(),a=r.width/(r.height||1)||1,minH=c[2],minW=c[3]||c[2]*1.15;let h=Math.max(minH,minW/a,(r.height||300)/1.75);h=Math.min(h,Math.max(minH,860));const w=h*a;return[c[0]-w/2,c[1]-h/2,w,h]};
+const rectFor=c=>{const r=visual.getBoundingClientRect(),a=r.width/(r.height||1)||1,minH=c[2],minW=c[3]||c[2]*1.15;let h=Math.max(minH*(minH<500?1-.2*collP:1),minW/a,(r.height||300)/1.75);h=Math.min(h,Math.max(minH,860));const w=h*a;return[c[0]-w/2,c[1]-h/2,w,h]};
 const setVB=v=>{vb=v;map.setAttribute('viewBox',v.map(x=>x.toFixed(2)).join(' '))};
 const cam=(c,instant)=>{camC=c;if(camA)cancelAnimationFrame(camA);if(instant||reduce){setVB(rectFor(c));return}
 const from=vb.slice(),t0=performance.now(),D=950;
@@ -502,7 +565,7 @@ let pFn=null;
 const setP=(label,fn,o={})=>{primary.textContent=label;pFn=o.locked?null:fn;primary.classList.toggle('locked',!!o.locked);primary.classList.toggle('pulse',!!o.pulse&&!reduce);primary.setAttribute('aria-disabled',o.locked?'true':'false');hint.innerHTML=o.hint?`${o.locked?upSVG:handSVG}<span>${o.hint}</span>`:'';requestAnimationFrame(moreCheck)};
 const moreCheck=()=>card.classList.toggle('more',card.scrollHeight-card.scrollTop-card.clientHeight>8);
 card.addEventListener('scroll',moreCheck,{passive:true});new ResizeObserver(moreCheck).observe(card);
-const reveal=el=>{if(!el)return;setTimeout(()=>{const r=el.getBoundingClientRect(),c=card.getBoundingClientRect();let d=0;if(r.bottom>c.bottom-8)d=Math.min(r.bottom-c.bottom+16,r.top-c.top-8);else if(r.top<c.top)d=r.top-c.top-8;if(d)card.scrollBy({top:d,behavior:reduce?'auto':'smooth'});moreCheck()},80)};
+const reveal=el=>{if(!el)return;setTimeout(()=>{if(mq.matches){const r=el.getBoundingClientRect(),y=scrollY,top=r.top+y,bot=r.bottom+y,tH=topEl.offsetHeight,aH=actEl.offsetHeight,vh=VV();let t=Math.max(0,bot-(vh-aH-14));if(top-t<tH+Math.max(hc,he-t)+6)t=Math.max(0,top-tH-hc-14);t=Math.min(t,Math.max(0,document.documentElement.scrollHeight-vh));if(Math.abs(t-y)>4)scrollTo({top:t,behavior:reduce?'auto':'smooth'});return}const r=el.getBoundingClientRect(),c=card.getBoundingClientRect();let d=0;if(r.bottom>c.bottom-8)d=Math.min(r.bottom-c.bottom+16,r.top-c.top-8);else if(r.top<c.top)d=r.top-c.top-8;if(d)card.scrollBy({top:d,behavior:reduce?'auto':'smooth'});moreCheck()},80)};
 primary.addEventListener('click',()=>{if(pFn)pFn()});
 
 /* ---------- scenes ---------- */
@@ -556,10 +619,10 @@ const S=[
  html:()=>`<h2>الموجة</h2><p>الشهوة تأتي كموجة: تبدأ، ثم تعلو، ثم تبلغ ذروتها، ثم تهبط وحدها إن لم تُغذَّ.</p><div class="ask" id="ask"></div>`,
  enter(){waveTo(fSingle);markLoop();onLeave(markOff);ask($('ask'),'when',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
 
-{id:'fallY',ch:2,only:'y',name:'النزول',vis:'map',h:'n',cam:[252,585,240],show:['star','eye','beam','brain','orbit','arrow','wave','fallY'],focus:['fallY','wave'],
+{id:'fallY',ch:2,only:'y',name:'النزول',vis:'map',h:'n',cam:[252,566,262],show:['star','eye','beam','brain','orbit','arrow','wave','fallY'],focus:['fallY','wave'],
  html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول.</p><p class="call">النزول هو خروج المَنِيّ.</p><p>وخروج المني في غير الزواج، أو في غير الاحتِلام أثناء النوم، غير صحيح ومحرّم، ويضرّك نفسيًا وذهنيًا.</p><p class="call warn">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>`,
  enter(){waveTo(fSingle,true);nextP()}},
-{id:'fall',ch:2,only:'o',name:'النزول',vis:'map',h:'n',cam:[252,600,245],show:['star','eye','beam','brain','orbit','arrow','wave','fallS','fallG'],focus:['fallS','fallG','wave'],
+{id:'fall',ch:2,only:'o',name:'النزول',vis:'map',h:'n',cam:[252,566,262],show:['star','eye','beam','brain','orbit','arrow','wave','fallS','fallG'],focus:['fallS','fallG','wave'],
  html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول (خروج المني). والنزول طريقان، وكلاهما خطأ:</p><div class="two"><button data-p="S">فردي</button><button data-p="G">مع آخرين</button></div><div id="panes"></div>`,
  enter(){waveTo(fSingle,true);const T={S:'<b>فردي (الاستمناء):</b> أضرار نفسية وذهنية: تعلّق وإدمان، وتشتّت التركيز، وشعور دائم بالذنب.',G:'<b>مع آخرين (الزنا أو اللواط):</b> كل ما سبق، ويُضاف إليه: الأمراض الجنسية المعدية، والفضيحة؛ فقد لا يرى الطرف الآخر في الأمر خطأً، أو ينقلب عليك، والابتزاز.'};
  const got=new Set();const upd=()=>{if(got.size<2)setP(`اضغط الطريقين (${ar(got.size)} من ٢)`,null,{locked:1,hint:'اضغط «فردي» ثم «مع آخرين» في الأعلى'});else{if(!$('endC')){$('panes').insertAdjacentHTML('afterend','<p class="call warn" id="endC">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>');reveal($('endC'))}nextP({pulse:1})}};
@@ -644,7 +707,7 @@ cur=i;const s=L[i];seen.add(s.id);
 const c=CH[s.ch];document.body.style.backgroundColor=c.bg;document.documentElement.style.setProperty('--ac',c.ac);document.documentElement.style.setProperty('--bg',c.bg);
 $('chName').textContent=s.ch?`${ar(s.ch)} · ${c.n}`:c.n;$('count').textContent=s.ch?`${ar(i+1)} / ${ar(L.length)}`:'';
 paintProg();
-visual.dataset.h=s.h||'n';
+visual.dataset.h=s.h||'n';if(mq.matches)scrollTo(0,0);layoutStep(s.h,dir!==0);
 const isMap=s.vis==='map';visual.classList.toggle('altOn',!isMap);document.querySelectorAll('.alt').forEach(a=>a.classList.toggle('on',a.dataset.v===s.vis));
 if(isMap){resetMap();setShow(s.show||[],s.focus,s.ghost);cam(s.cam||FULL,dir===0)}
 card.innerHTML=s.html();card.scrollTop=0;
@@ -659,8 +722,8 @@ if(e.key==='ArrowLeft'&&pFn&&primary.textContent.startsWith('التالي'))pFn(
 
 /* ---------- menu ---------- */
 const sheet=$('sheet'),scrim=$('scrim');
-function openSheet(){buildList();sheet.classList.add('on');scrim.classList.add('on');$('menuBtn').setAttribute('aria-expanded','true');$('closeSheet').focus()}
-function closeSheet(){sheet.classList.remove('on');scrim.classList.remove('on');$('menuBtn').setAttribute('aria-expanded','false');$('menuBtn').focus()}
+function openSheet(){document.body.classList.add('lock');buildList();sheet.classList.add('on');scrim.classList.add('on');$('menuBtn').setAttribute('aria-expanded','true');$('closeSheet').focus()}
+function closeSheet(){document.body.classList.remove('lock');sheet.classList.remove('on');scrim.classList.remove('on');$('menuBtn').setAttribute('aria-expanded','false');$('menuBtn').focus()}
 $('menuBtn').addEventListener('click',openSheet);$('closeSheet').addEventListener('click',closeSheet);scrim.addEventListener('click',closeSheet);
 const buildList=()=>{const L=list();let h='';CH.forEach((c,k)=>{const items=L.filter(s=>s.ch===k);if(!items.length)return;h+=`<p class="chT">${k?`الفصل ${ar(k)} · `:''}${c.n}</p><div class="stL">`+items.map(s=>{const i=L.indexOf(s),ok=seen.has(s.id)||i<=cur+1;return`<button data-i="${i}" class="${i===cur?'cur':seen.has(s.id)?'seen':''}" ${ok?'':'disabled'}><span class="d"></span>${s.name}${ok?'':' 🔒'}</button>`}).join('')+'</div>'});
 $('stList').innerHTML=h;$('stList').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;closeSheet();go(i,i>=cur?1:-1)}));
@@ -721,7 +784,7 @@ drops[name]={k,parts,thread,ring,kick:-99}}
 const cv=renderer.domElement;box.prepend(cv);
 let sel=null;
 const size=()=>{const W=box.clientWidth||300,H=box.clientHeight||200;renderer.setSize(W,H,false);cam.aspect=W/H;cam.updateProjectionMatrix()};
-new ResizeObserver(size).observe(box);size();
+let rsT=null;new ResizeObserver(()=>{clearTimeout(rsT);rsT=setTimeout(size,160)}).observe(box);size();
 const now=()=>performance.now()/1000;
 const kick=n=>{drops[n].kick=now()};
 cv.addEventListener('pointerdown',e=>{e.preventDefault();const r=cv.getBoundingClientRect(),fx=(e.clientX-r.left)/r.width;const n=fx>.64?'mathy':fx>.36?'wadi':'mani';kick(n);dispatchEvent(new CustomEvent('droptap',{detail:n}))});
