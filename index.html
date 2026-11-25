@@ -95,6 +95,23 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 .meter span{height:10px;border-radius:6px;background:rgba(255,255,255,.12);transition:background-color .35s}
 .mlab{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;font-size:12px;color:var(--muted);text-align:center}
 .zone{margin-top:8px;min-height:3.4em}
+.legend{position:absolute;bottom:10px;inset-inline-end:10px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:5px;pointer-events:none}
+.legend span{display:flex;align-items:center;gap:7px;background:rgba(5,12,15,.8);border:1px solid var(--edge);border-radius:99px;padding:3px 11px 3px 8px;font-size:12.5px;font-weight:700;line-height:1.5;color:var(--ink);opacity:0;transform:translateY(5px);transition:opacity .4s,transform .4s}
+.legend span.on{opacity:1;transform:none}
+.legend svg{width:20px;height:20px;flex:none}
+.thought{--c:#36c2d6;position:relative;border-radius:22px;padding:11px 16px 14px;background:color-mix(in srgb,var(--c) 9%,#0d171b);border:1.5px solid color-mix(in srgb,var(--c) 60%,transparent);transition:border-color .4s,background-color .4s}
+.thought::before,.thought::after{content:"";position:absolute;border-radius:50%;background:inherit;border:inherit}
+.thought::before{width:14px;height:14px;top:-11px;inset-inline-start:34px}
+.thought::after{width:8px;height:8px;top:-21px;inset-inline-start:27px}
+.thought .th{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.thought .who{font-size:13.5px;color:var(--muted)}
+.thought .st{font:800 13px/1.7 "Cairo",sans-serif;color:#081013;background:var(--c);border-radius:99px;padding:0 11px;transition:background-color .4s}
+.thought .say{display:block;font:800 20px/1.6 "Cairo",sans-serif;color:#fff;margin:4px 0 2px}
+.thought .ex{display:block;font-size:15.5px;line-height:1.7}
+.thought .ex:empty{display:none}
+.card>.thought{margin-top:22px}
+.thought .tbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:10px}
+.thought .tbar span{height:6px;border-radius:3px;background:rgba(255,255,255,.1);transition:background-color .3s}
 .zone b{display:block;font:800 22px/1.9 "Cairo",sans-serif;padding-bottom:4px;overflow:visible}
 .status{margin-top:8px;border-radius:14px;padding:10px 14px;background:rgba(0,0,0,.25);border:1px solid var(--edge);min-height:3.6em}
 .status b{color:var(--ac)}
@@ -161,7 +178,9 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 #map.shut .eyeO{opacity:0}
 #map.shut .eyeC{opacity:1}
 #map.shut .flow{opacity:0}
-#map .bgl,#map .pgl,#map .spk{transition:opacity .4s}
+#map .bgl,#map .pgl,#map #staticG{transition:opacity .5s}
+#map .tb{opacity:0;transform:scale(.15);transform-box:fill-box;transform-origin:center;transition:opacity .3s ease,transform .45s cubic-bezier(.34,1.56,.64,1)}
+#map .tb.on{opacity:1;transform:none}
 #map.sh1 .brainG{animation:shake .18s linear infinite}
 #map.sh2 .brainG{animation:shake .09s linear infinite}
 @keyframes shake{25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1.5px,1px)}75%{transform:translate(1px,1.5px)}}
@@ -296,6 +315,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <path id="beam2" d="M258 124C270 162 240 190 260 216"/>
 <path id="o1" d="M98 283Q130 252 166 278"/>
 <path id="o2" d="M166 330Q130 358 98 322"/>
+<clipPath id="brainClip"><path transform="translate(255 305) scale(.85)" d="M-112 6C-122-38-92-80-48-86C-26-108 22-110 46-92C86-98 120-64 116-24C132 0 120 40 92 52C80 80 40 86 18 72C0 86-34 86-52 70C-86 76-118 52-112 6Z"/></clipPath>
 <g id="brain">
 <path d="M-112 6C-122-38-92-80-48-86C-26-108 22-110 46-92C86-98 120-64 116-24C132 0 120 40 92 52C80 80 40 86 18 72C0 86-34 86-52 70C-86 76-118 52-112 6Z" fill="url(#bfill)" stroke="#8ee8f4" stroke-width="3"/>
 <g fill="none" stroke="#8ee8f4" stroke-width="2.6" stroke-linecap="round" opacity=".8"><path d="M-84-26q16-22 32-6t32-8t30 2t30-6"/><path d="M-96 10q20-16 38 0t36-6t36 4t36-4"/><path d="M-62 46q16-16 32-2t30-4t30 2"/><path d="M-26-84q8 26-8 46"/><path d="M28-86q-12 28 6 50"/><path d="M80-62q-18 14-10 36"/><path d="M-70-58q14 6 20 22"/></g>
@@ -336,7 +356,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <circle class="bgl" cx="255" cy="305" r="128" fill="url(#bglow)" opacity=".55"/>
 <circle class="pgl" cx="255" cy="305" r="135" fill="url(#rglow)" opacity="0"/>
 <g class="brainG"><use href="#brain" transform="translate(255 305) scale(.85)"/></g>
-<g id="sparkG"></g>
+<g id="staticG" opacity="0" clip-path="url(#brainClip)"></g><g id="thoughtG"></g>
 <text x="388" y="311" text-anchor="middle" font-size="21" fill="#8ee8f4">الخيال</text>
 </g>
 
@@ -426,6 +446,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <text x="145" y="186" text-anchor="middle" font-size="22" fill="#4ee0a6">لا، شكرًا</text>
 </svg></div>
 
+<div class="legend" id="legend" aria-hidden="true"></div>
 <div class="banner" id="banner"><small id="bnK"></small><b id="bnT"></b></div>
 </div>
 
@@ -469,7 +490,7 @@ doubt:{q:'بعد تفكير، وجدت بللًا ولا تدري: أهو مذي
 when:{q:'متى تكون المقاومة أسهل؟',o:[['عند الذروة، لأنني أشعر بالخطر',0,'الذروة أصعب لحظة، والضغط فيها في أعلى درجاته.'],['في بدايتها، عند أول علامة',1,'صحيح. ولهذا أهم مهارة أن تنتبه متى تبدأ الموجة، فتفعّل حالة الطوارئ قبل أن تعلو. كثير من الناس لا يميّز البداية، فيجد نفسه واقعًا في الذنب ولا يدري متى بدأ الأمر.'],['بعد أن تهبط',0,'بعد الهبوط لا مقاومة أصلًا؛ المهم أن تصل إليه دون سقوط.']]},
 fluid:{q:'خرج منك سائل شفاف لَزِج بعد تفكير، دون دَفْق ولا لذّة كاملة. ما هو، وما حكمه؟',o:[['مني، ويجب الغسل',0,'المني يخرج بدفق ولذة ويعقبه فتور، وهذا لم يحدث.'],[()=>tr==='y'?'مذي: يُغسل مكانه ويُتوضأ، ولا يُعدّ نزولًا':'مذي: يُغسل مكانه ويُتوضأ، وليس استمناءً',1,'صحيح. فلا تحكم على نفسك بالسقوط، ولا تجعله بابًا لليأس أو الوسوسة. وإن كان سبب الإثارة نظرًا محرمًا، فالذنب في النظر وحده، وتكفيه التوبة.'],['لا شيء عليّ إطلاقًا',0,'المذي نجس: يُغسل مكانه، ويجب الوضوء للصلاة.']]},
 g1:{q:'ظهر لك مقطع فيه تلميحات وأنت تتصفح. ماذا تفعل؟',o:[['أكمل قليلًا لأرى',0,'تلك الثواني القليلة هي التي تُدخل الوقود إلى الخيال.'],['أتجاوزه فورًا، وأبتعد عن المصدر الذي أظهره',1,'صحيح: غضّ البصر من أول لحظة، وهي أسهل بوابة.']]},
-g2:{q:'دخلت الفكرة رغم ذلك، وبدأت تتكرر وأنت وحدك. ماذا تفعل؟',o:[['أبقى مكاني حتى تذهب',0,'البقاء في الظرف نفسه يغذّيها؛ الوحدة نفسها محفز.'],['أفكر فيها قليلًا ثم أتوقف',0,'«قليلًا» هو الاسترسال نفسه، وكل لحظة فيه ترفع الضغط.'],['أقطعها، وأغيّر مكاني، وأشغل نفسي بشيء نافع',1,'صحيح: هذه هي العزيمة.']]},
+g2:{q:'دخلت الفكرة رغم ذلك، وبدأت تتكرر وأنت وحدك. ماذا تفعل؟',o:[['أبقى مكاني حتى تذهب',0,'البقاء في الظرف نفسه يغذّيها؛ الوحدة نفسها محفز.'],['أفكر فيها قليلًا ثم أتوقف',0,'«قليلًا» يعني أن تترك الفكرة تكبر، وكل لحظة ترفع الضغط.'],['أقطعها، وأغيّر مكاني، وأشغل نفسي بشيء نافع',1,'صحيح: هذه هي العزيمة.']]},
 g3:{q:'وقعتَ في الذنب. ماذا تفعل الآن؟',o:[['أستسلم، فقد انتهيت',0,'هذا أخطر ما في السقوط؛ اليأس يعيدك إلى الحلقة.'],['أنتظر حتى أشعر أني أستحق التوبة',0,'التوبة لا تنتظر الاستحقاق؛ بابها مفتوح الآن.'],['أتوب وأبدأ من جديد، دون جلد للذات',1,'صحيح. التوبة تعيدك إلى أول الطريق أقوى.']]},
 sc0:{q:'شخص تعرّفت عليه عبر الإنترنت يهدّدك بنشر صور إن لم ترسل المزيد. ماذا تفعل؟',o:[['أرسل ما يطلب لينتهي الأمر',0,'المبتز لا يتوقف؛ كل ما ترسله يزيد سيطرته عليك.'],['أدفع له مالًا',0,'الدفع يفتح بابًا لطلبات أكثر.'],['أتوقف عن الرد، ولا أحذف المحادثة، وأخبر والديّ أو شخصًا أثق به فورًا',1,'صحيح. لا ترضخ ولا تدفع. وهناك جهات رسمية مختصة بالجرائم الإلكترونية تتعامل مع هذا بسرية.']]},
 sc1:{q:'أحد أقاربك يتصرّف معك تصرّفات غير مريحة، ويطلب أن يبقى الأمر سرًا بينكما. ماذا تفعل؟',o:[['أسكت حفاظًا على العائلة',0,'السكوت يحمي المؤذي ويتركك وحدك؛ العائلة تُحمى بالكلام لا بالصمت.'],['أواجهه وحدي',0,'المواجهة وحدك قد تعرّضك للخطر؛ لا تحمل هذا وحدك.'],['أخبر والديّ أو شخصًا راشدًا أثق به فورًا',1,'صحيح، ولن تُلام. وطلبُه الكتمانَ علامةُ خطرٍ بحد ذاتها.']]},
@@ -513,10 +534,33 @@ const shut=on=>map.classList.toggle('shut',on);
 const feedG=$('feedG');
 const feed=(n,dur,sc,col)=>{feedG.innerHTML=Array.from({length:n},(_,k)=>`<g><g transform="scale(${sc})"><rect x="-8" y="-11" width="16" height="22" rx="4" fill="${col}"/><path d="M-3-5L5 0L-3 5Z" fill="#1a1008"/></g><animateMotion dur="${dur}s" begin="-${(dur*k/n).toFixed(2)}s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></g>`).join('')};
 /* brain pressure */
-const SP=[[-60,-50],[40,-62],[-85,0],[85,-10],[-40,60],[50,55],[0,-80],[-90,-40],[90,40],[-70,75],[75,80],[0,90],[-20,-20],[30,15]];
-$('sparkG').innerHTML=SP.map((p,i)=>`<circle class="spk" cx="${255+p[0]}" cy="${305+p[1]}" r="6" fill="${i%3?'#8ee8f4':'#ffc94d'}" opacity="0"><animate attributeName="r" values="${3+i%3};${8+i%3*3};${3+i%3}" dur="${(1.2+i%4*.3).toFixed(1)}s" begin="-${(i*.2).toFixed(1)}s" repeatCount="indefinite"/></circle>`).join('');
-const spk=[...map.querySelectorAll('.spk')],bgl=map.querySelector('.bgl'),pgl=map.querySelector('.pgl');
-const pressure=p=>{const n=[0,3,6,10,14][p];spk.forEach((c,i)=>c.setAttribute('opacity',i<n?1:0));pgl.setAttribute('opacity',[0,.05,.2,.4,.65][p]);bgl.setAttribute('opacity',[.55,.7,.85,.95,1][p]);map.classList.toggle('sh1',p===3);map.classList.toggle('sh2',p===4)};
+/* thoughts: bubbles gather around the head; static when thinking gets cloudy */
+const TB=[[318,212,20,0],[188,212,21,1],[262,262,16,1],[346,250,20,2],[212,332,18,2],[150,256,18,3],[302,324,19,3],[236,188,15,3],[182,292,15,4],[336,186,15,4],[276,206,15,4]];
+const TCOL=[['#8ee8f4','#123c46'],['#4ee0a6','#0f3a33'],['#ffc94d','#3a2f10'],['#ff9f43','#3d2410'],['#ff7a7a','#3d1517']];
+const LOBES=[[0,0,.62],[-.42,-.18,.46],[.42,-.2,.46],[-.2,-.44,.42],[.24,-.42,.42],[-.46,.2,.4],[.44,.2,.4],[0,.34,.44]];
+const f1=v=>v.toFixed(1);
+const bubble=(x,y,r,l,i)=>{const [ln,fl]=TCOL[l],dx=255-x,dy=305-y,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,sw=Math.max(1.6,r*.09);
+const cl=(c,e)=>LOBES.map(([a,b,k])=>`<circle cx="${f1(a*r)}" cy="${f1(b*r)}" r="${f1(k*r+e)}" fill="${c}"/>`).join('');
+const sc=l<3?`<path d="M${f1(-.42*r)} ${f1(.02*r)}q${f1(.105*r)} ${f1(-.22*r)} ${f1(.21*r)} 0t${f1(.21*r)} 0t${f1(.21*r)} 0t${f1(.21*r)} 0" fill="none" stroke="${ln}" stroke-width="${f1(sw)}" stroke-linecap="round"/>`
+:`<path d="M${f1(-.44*r)} ${f1(.1*r)}c${f1(.1*r)} ${f1(-.42*r)} ${f1(.34*r)} ${f1(-.36*r)} ${f1(.22*r)} ${f1(-.02*r)}s${f1(-.3*r)} ${f1(.2*r)} ${f1(-.02*r)} ${f1(.14*r)}s${f1(.36*r)} ${f1(-.42*r)} ${f1(.42*r)} ${f1(-.04*r)}s${f1(-.2*r)} ${f1(.3*r)} ${f1(.22*r)} ${f1(.06*r)}" fill="none" stroke="${ln}" stroke-width="${f1(sw)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const tail=[[1.12,.17],[1.5,.1]].map(([k,z])=>`<circle cx="${f1(ux*r*k)}" cy="${f1(uy*r*k)}" r="${f1(r*z)}" fill="${fl}" stroke="${ln}" stroke-width="${f1(sw*.8)}"/>`).join('');
+const bob=reduce?'':`<animateTransform attributeName="transform" type="translate" values="0 0;${l>2?'1.6 -2':'0 -3.5'};0 0" dur="${((l>2?.9:2.6)+i%3*.35).toFixed(2)}s" begin="-${(i*.37).toFixed(2)}s" repeatCount="indefinite"/>`;
+return `<g transform="translate(${x} ${y})"><g class="tb"><g>${bob}${tail}${cl(ln,sw)}${cl(fl,0)}${sc}</g></g></g>`};
+$('thoughtG').innerHTML=TB.map(([x,y,r,l],i)=>bubble(x,y,r,l,i)).join('');
+const tbs=[...map.querySelectorAll('#thoughtG .tb')],staticG=$('staticG');
+{const c=document.createElement('canvas');c.width=c.height=96;const g=c.getContext('2d'),im=g.createImageData(96,96);
+for(let k=0;k<im.data.length;k+=4){const v=Math.random()<.5?255:18;im.data[k]=im.data[k+1]=im.data[k+2]=v;im.data[k+3]=Math.random()*210|0}
+g.putImageData(im,0,0);
+const jit=reduce?'':'<animate attributeName="x" values="138;147;131;144;135" dur=".42s" calcMode="discrete" repeatCount="indefinite"/><animate attributeName="y" values="190;199;185;195;202" dur=".42s" calcMode="discrete" repeatCount="indefinite"/>';
+staticG.innerHTML=`<image href="${c.toDataURL()}" x="138" y="190" width="250" height="235" preserveAspectRatio="none" style="image-rendering:pixelated">${jit}</image>`}
+const bgl=map.querySelector('.bgl'),pgl=map.querySelector('.pgl');
+const NB=[0,3,5,8,11];
+const pressure=(p,n)=>{n=n==null?NB[p]:n;tbs.forEach((g,k)=>g.classList.toggle('on',k<n));pgl.setAttribute('opacity',[0,.05,.2,.4,.65][p]);bgl.setAttribute('opacity',[.55,.7,.85,.95,1][p]);staticG.setAttribute('opacity',[0,0,.14,.4,.66][p]);map.classList.toggle('sh1',p===3);map.classList.toggle('sh2',p===4)};
+/* legend chips on the picture */
+const legendEl=$('legend');
+{
+legendEl.innerHTML=`<span data-l="1"><svg viewBox="-12 -12 24 24"><g fill="#123c46" stroke="#8ee8f4" stroke-width="1.6"><circle cx="6" cy="7.5" r="1.8"/><circle cy="-1" r="7.5"/></g><path d="M-3.8-1q1.25-2.2 2.5 0t2.5 0t2.5 0" fill="none" stroke="#8ee8f4" stroke-width="1.5" stroke-linecap="round"/></svg>الفقاعات = أفكارك</span>`}
+const legend=n=>legendEl.querySelectorAll('span').forEach(e=>e.classList.toggle('on',+e.dataset.l<=n));
 /* orbit */
 const orbG=$('orbG');
 const orbit=dur=>{orbG.innerHTML=['o1','o2'].map((id,k)=>[0,1].map(j=>`<circle r="5" fill="${k?'#8ee8f4':'#fff'}"><animateMotion dur="${dur}s" begin="-${((j/2)*dur+k*dur/4).toFixed(2)}s" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`).join('')).join('')};
@@ -592,17 +636,30 @@ const S=[
 {id:'star',ch:1,name:'الدافع الفطري',vis:'map',h:'n',cam:[130,312,290],show:['star'],
  html:()=>`<h2>الشَّرارة: الدافع الفِطري</h2><p>الشهوة دافع خلقه الله في كل إنسان. يأتي ويذهب، ولا يمكن إيقافه.</p><p class="call">وجودها ليس عيبًا فيك. السؤال المهم: ماذا تفعل حين تأتي؟</p>`,
  enter(){nextP()}},
-{id:'brain',ch:1,name:'الخيال',vis:'map',h:'n',cam:[262,300,285],show:['star','brain'],focus:['brain'],
- html:()=>`<h2>المصنع: الخيال</h2><p>حين يأتي الدافع، يبدأ العقلُ بتوليد الصور والأفكار. وكلما استرسلت مع الفكرة، ارتفع الضغط وصعب القطع.</p>
-<div class="meter" id="meter"><span></span><span></span><span></span><span></span><span></span></div><div class="mlab"><span>هدوء</span><span>تفكير</span><span>إلحاح</span><span>ضغط</span><span>حافة</span></div><div class="zone" id="zone"></div>`,
- enter(){const Z=[['هدوء','#36c2d6','الدافع ساكن، والعقل مشغول بغيره.'],['بداية التفكير','#4ee0a6','بدأت الأفكار. هذه بداية الموجة: هنا تفعّل حالة الطوارئ.'],['إلحاح','#ffc94d','الأفكار تتكرر وتطلب المزيد. القطع ممكن لكنه أصعب.'],['ضغط شديد','#ff9f43','العقل والجسد يضغطان، والتفكير المنطقي يضعف.'],['حافة السقوط','#ff7a7a','أصعب لحظة: أي محفز صغير يكفي للسقوط.']];
- let p=0;const paint=()=>{pressure(p);[...$('meter').children].forEach((s,i)=>s.style.background=i<=p&&p>0||i===0&&p===0?Z[Math.max(p,0)][1]:'');$('zone').innerHTML=`<b style="color:${Z[p][1]}">${Z[p][0]}</b>${Z[p][2]}`};paint();
- const up=()=>{p++;paint();reveal($('zone'));if(p<4)setP(`استرسل في الفكرة (${ar(p+1)} من ٤)`,up,{hint:'استمر في الضغط ولاحظ الدماغ'});else setP('اقطع الفكرة',cut,{pulse:1,hint:'الآن جرّب العزيمة'})};
- const cut=()=>{setP('…',null,{locked:1});let k=p;const t=setInterval(()=>{k--;p=k;paint();if(k<=0){clearInterval(t);$('zone').insertAdjacentHTML('afterend','<p class="call mint" id="zend">هذه هي العزيمة. ولو قطعتها عند «بداية التفكير» لكان القطع أسهل بكثير.</p>');reveal($('zend'));nextP({pulse:1})}},reduce?0:170);onLeave(()=>clearInterval(t))};
- setP('استرسل في الفكرة (١ من ٤)',up,{pulse:1,hint:'جرّب بنفسك: اضغط الزر عدة مرات'})}},
+{id:'brain',ch:1,name:'الخيال',vis:'map',h:'n',cam:[262,286,292],show:['brain'],focus:['brain'],
+ html:()=>`<h2>الخيال: الأفكار في رأسك</h2><p>تخيّل: أنت وحدك في غرفتك ليلًا، والجوال في يدك… فخطرت لك فكرة.</p>
+<div class="thought" id="thought"><div class="th"><span class="who">تقول لنفسك:</span><span class="st" id="tst"></span></div><span class="say" id="say"></span><span class="ex" id="tex"></span><div class="tbar" id="meter"><span></span><span></span><span></span><span></span><span></span></div></div>`,
+ enter(){const Z=[
+ ['هدوء','#36c2d6','«مجرد فكرة مرّت…»','لم تتمسّك بها بعد.'],
+ ['بداية التفكير','#4ee0a6','«سأفكر فيها دقيقة فقط.»','هنا تبدأ الموجة، وهذه أسهل لحظة لقطع الفكرة.'],
+ ['تلحّ عليك','#ffc94d','«سأكمل قليلًا ثم أتوقف.»','الأفكار تتكرر وتطلب المزيد. قطعها ما زال ممكنًا، لكنه صار أصعب.'],
+ ['ضغط شديد','#ff9f43','«لا أستطيع أن أُخرجها من رأسي.»','رأسك مزدحم بالأفكار ومشوَّش، ولم تعد تفكر بهدوء.'],
+ ['حافة السقوط','#ff7a7a','«لم أعد أستطيع المقاومة…»','أصعب لحظة: أي شيء صغير الآن يكفي لتسقط.']];
+ let p=0;
+ const say=(name,col,q,ex,anim)=>{const t=$('thought');t.style.setProperty('--c',col);$('tst').textContent=name;$('say').textContent=q;$('tex').textContent=ex;if(anim&&!reduce&&t.animate)t.animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:380,easing:'ease-out'})};
+ const meter=lv=>[...$('meter').children].forEach((e,k)=>e.style.background=k<=lv?Z[lv][1]:'');
+ const paint=anim=>{const z=Z[p];pressure(p,p===0?1:undefined);meter(p);say(z[0],z[1],z[2],z[3],anim);legend(1)};
+ paint(false);
+ const up=()=>{p++;paint(true);reveal($('thought'));if(p<4)setP(`اترك الفكرة تكبر (${ar(p+1)} من ٤)`,up,{hint:'استمر، وراقب الأفكار في الرسم'});else setP('اقطع الفكرة',cut,{pulse:1,hint:'الآن جرّب العزيمة: اقطعها'})};
+ const cut=()=>{setP('…',null,{locked:1});say('أنت تقطعها','#4ee0a6','«لا. سأقطعها الآن.»','',true);
+ let n=NB[4];const LV=v=>v>=9?4:v>=6?3:v>=4?2:v>=1?1:0;
+ const t=setInterval(()=>{n--;const lv=LV(n);pressure(lv,n);meter(lv);
+ if(n<=0){clearInterval(t);legend(0);say('عاد الهدوء','#4ee0a6','«لا. سأقطعها الآن.»','قطعتَ الفكرة، فهدأ رأسك.',false);
+ $('thought').insertAdjacentHTML('afterend','<p class="call mint" id="zend">هذه هي العزيمة. لكن لاحظ: لو قطعتها عند «بداية التفكير» لكان الأمر أسهل بكثير.</p>');reveal($('zend'));nextP({pulse:1})}},reduce?0:130);onLeave(()=>clearInterval(t))};
+ setP('اترك الفكرة تكبر (١ من ٤)',up,{pulse:1,hint:'هذه تجربة: اضغط، وراقب ماذا يحدث في رأسك'})}},
 {id:'eye',ch:1,name:'العين',vis:'map',h:'n',cam:[250,200,380],show:['star','brain','eye','beam'],focus:['eye','beam','brain'],
- html:()=>`<h2>الباب: العين، وكيف تغذّي الخيال</h2><p>الخيال لا يعمل وحده؛ وقوده الأكبر ما يدخل من العين: مقاطع، وصور، وأغانٍ، وكلام. انظر كيف تتدفّق إليه فتُشعله.</p><div id="after"></div>`,
- enter(){pressure(2);setP('غُضَّ بصرك',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين غضضتَ بصرك توقّف الوقود، فهدأ الخيال. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+ html:()=>`<h2>الباب: العين، وكيف تغذّي الخيال</h2><p>الأفكار في رأسك لا تأتي وحدها؛ وقودها الأكبر ما يدخل من العين: مقاطع، وصور، وأغانٍ، وكلام. انظر كيف تتدفّق إليه فتملؤه بالأفكار.</p><div id="after"></div>`,
+ enter(){pressure(2);setP('غُضَّ بصرك',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين غضضتَ بصرك توقّف الوقود، فاختفت الأفكار وهدأ رأسك. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
 {id:'loop',ch:1,name:'كيف يصبح إدمانًا',vis:'map',h:'t',cam:[228,312,560],show:['star','eye','beam','brain','orbit','arrow','wave','dline'],
  html:()=>`<h2>الحَلْقة: كيف يصبح إدمانًا؟</h2><p>الدافع يحرّك الخيال، والخيال يستدعي الدافع. أدخل محفزات من العين، ولاحظ الحلقة والموجات.</p><div class="status" id="lst" aria-live="polite"></div>`,
  enter(){const L=[['البداية','دوران هادئ، وموجات قليلة ومتباعدة.',3.2,fMulti(2,.38),0,[0,1,1,'#ffc94d']],['دخل محفز','اشتعل الخيال، وعلت الموجة أكثر من طبيعتها.',2.1,fMulti(3,.6),1,[2,2.2,.85,'#ffc94d']],['التكرار','الحلقة أسرع: الدافع يعود أسرع وأقوى، والموجات تتقارب.',1.2,fMulti(6,.82),2,[3,1.5,1,'#ffc94d']],['التعوّد ثم الإدمان','المعتاد لم يعد يكفي، فيبحث عن الأغرب والأشد. والموجات تتجاوز خط السقوط باستمرار.',.65,fMulti(9,1.02),3,[5,.9,1.3,'#ff7a7a']]];
@@ -684,7 +741,7 @@ const S=[
  enter(){ask($('ask'),'sc2',()=>{$('after').innerHTML='<p class="call">ومن تعرفه منخرطًا في هذه الأمور ووصل فيها مراحل بعيدة، أبعِدْه عن بيتك وأهلك، فلا تضمن كيف ينظر إليهم.</p>';reveal($('after'));nextP({pulse:1})});setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
 
 {id:'end',ch:5,name:'الخاتمة',vis:'map',h:'t',cam:FULL,show:MAPALL,
- html:()=>`<h2>الطريق كاملًا</h2><ul class="sum"><li><b style="color:var(--cyan)">الخيال</b> مصنع: الاسترسال يرفع الضغط.</li><li><b style="color:var(--gold)">العين</b> باب: ما يدخل منها وقود للخيال.</li><li><b style="color:var(--sea)">الموجة</b> تمرّ إن صبرت؛ انتبه لبدايتها.</li><li><b style="color:var(--mint)">البوابات:</b> غضّ البصر، والعزيمة، والتوبة.</li></ul><p class="call">باب التوبة مفتوح دائمًا، ومن سقط ثم قام فقد انتصر.</p><p class="priv" style="margin-top:10px">إن احتجت أن تتكلم، فاختر شخصًا تثق به، ولا تحمل الأمر وحدك.</p><button class="link" id="toMenu">راجع أي مرحلة من القائمة</button>`,
+ html:()=>`<h2>الطريق كاملًا</h2><ul class="sum"><li><b style="color:var(--cyan)">الخيال</b>: أفكار في رأسك؛ كلما تركتها تكبر ارتفع الضغط.</li><li><b style="color:var(--gold)">العين</b> باب: ما يدخل منها وقود للخيال.</li><li><b style="color:var(--sea)">الموجة</b> تمرّ إن صبرت؛ انتبه لبدايتها.</li><li><b style="color:var(--mint)">البوابات:</b> غضّ البصر، والعزيمة، والتوبة.</li></ul><p class="call">باب التوبة مفتوح دائمًا، ومن سقط ثم قام فقد انتصر.</p><p class="priv" style="margin-top:10px">إن احتجت أن تتكلم، فاختر شخصًا تثق به، ولا تحمل الأمر وحدك.</p><button class="link" id="toMenu">راجع أي مرحلة من القائمة</button>`,
  enter(){waveTo(fSingle,true);setP('ابدأ الرحلة من جديد',()=>go(0,-1));$('toMenu').addEventListener('click',openSheet)}}
 ];
 const list=()=>S.filter(s=>!s.only||s.only===tr);
@@ -710,7 +767,7 @@ paintProg();
 visual.dataset.h=s.h||'n';if(mq.matches)scrollTo(0,0);layoutStep(s.h,dir!==0);
 const isMap=s.vis==='map';visual.classList.toggle('altOn',!isMap);document.querySelectorAll('.alt').forEach(a=>a.classList.toggle('on',a.dataset.v===s.vis));
 if(isMap){resetMap();setShow(s.show||[],s.focus,s.ghost);cam(s.cam||FULL,dir===0)}
-card.innerHTML=s.html();card.scrollTop=0;
+legend(0);card.innerHTML=s.html();card.scrollTop=0;
 if(!reduce&&card.animate)card.animate([{opacity:0,transform:`translateX(${dir<0?28:-28}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)'});
 back.disabled=i===0;
 s.enter.call(s);
