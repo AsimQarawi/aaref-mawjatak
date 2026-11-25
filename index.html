@@ -111,6 +111,12 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 .thought .ex:empty{display:none}
 .card>.thought{margin-top:22px}
 .thought .tbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:10px}
+.lcard{--c:#8ee8f4;margin-top:12px;border-radius:18px;padding:10px 16px 13px;background:color-mix(in srgb,var(--c) 8%,#0d171b);border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);transition:border-color .4s,background-color .4s}
+.lcard .st{display:inline-block;font:800 13px/1.7 "Cairo",sans-serif;color:#081013;background:var(--c);border-radius:99px;padding:0 11px;transition:background-color .4s}
+.lcard .lmain{display:block;font:700 17px/1.7 "Cairo",sans-serif;color:#fff;margin-top:6px}
+.lcard .lvoice{display:block;margin-top:8px;padding-top:7px;border-top:1px dashed rgba(255,255,255,.16);font-size:15px;color:var(--muted)}
+.lcard .lvoice b{color:#fff;font-weight:800}
+.lcard .lvoice:empty{display:none}
 .thought .tbar span{height:6px;border-radius:3px;background:rgba(255,255,255,.1);transition:background-color .3s}
 .zone b{display:block;font:800 22px/1.9 "Cairo",sans-serif;padding-bottom:4px;overflow:visible}
 .status{margin-top:8px;border-radius:14px;padding:10px 14px;background:rgba(0,0,0,.25);border:1px solid var(--edge);min-height:3.6em}
@@ -185,6 +191,11 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 #map.sh2 .brainG{animation:shake .09s linear infinite}
 @keyframes shake{25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1.5px,1px)}75%{transform:translate(1px,1.5px)}}
 #map .wmk{transition:opacity .4s}
+#map .oA,#map .oB{transition:opacity .6s}
+#map.oStage .oA,#map.oStage .oB{opacity:0}
+#map.oStage.o1 .oA,#map.oStage.o2 .oB{opacity:1}
+#map.stFlick #stBody,.fflick{animation:flick 2.3s steps(1,end) infinite}
+@keyframes flick{0%{opacity:1}11%{opacity:.6}13%{opacity:1}46%{opacity:.8}48%{opacity:1}71%{opacity:.5}73%{opacity:1}}
 /* menu */
 .scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.3s;z-index:20}
 .scrim.on{opacity:1;visibility:visible}
@@ -307,14 +318,18 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <radialGradient id="rglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff6f6f" stop-opacity=".75"/><stop offset="1" stop-color="#ff6f6f" stop-opacity="0"/></radialGradient>
 <linearGradient id="bfill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d5965"/><stop offset="1" stop-color="#0d2a31"/></linearGradient>
 <radialGradient id="sglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<radialGradient id="sglowR" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7a5c" stop-opacity=".62"/><stop offset="1" stop-color="#ff7a5c" stop-opacity="0"/></radialGradient>
 <linearGradient id="wv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4aa8e8" stop-opacity=".85"/><stop offset="1" stop-color="#4aa8e8" stop-opacity=".06"/></linearGradient>
 <marker id="aw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f1f5f2"/></marker>
 <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ff7a7a"/></marker>
+<marker id="ac" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8ee8f4"/></marker>
 <marker id="am" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4ee0a6"/></marker>
 <path id="beam" d="M250 122C244 152 258 186 252 214"/>
 <path id="beam2" d="M258 124C270 162 240 190 260 216"/>
 <path id="o1" d="M98 283Q130 252 166 278"/>
 <path id="o2" d="M166 330Q130 358 98 322"/>
+<path id="sp1" d="M80 296Q150 226 232 282"/>
+<path id="sp2" d="M232 332Q150 384 80 316"/>
 <clipPath id="brainClip"><path transform="translate(255 305) scale(.85)" d="M-112 6C-122-38-92-80-48-86C-26-108 22-110 46-92C86-98 120-64 116-24C132 0 120 40 92 52C80 80 40 86 18 72C0 86-34 86-52 70C-86 76-118 52-112 6Z"/></clipPath>
 <g id="brain">
 <path d="M-112 6C-122-38-92-80-48-86C-26-108 22-110 46-92C86-98 120-64 116-24C132 0 120 40 92 52C80 80 40 86 18 72C0 86-34 86-52 70C-86 76-118 52-112 6Z" fill="url(#bfill)" stroke="#8ee8f4" stroke-width="3"/>
@@ -327,8 +342,8 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 </defs>
 
 <g class="el" data-el="star">
-<circle cx="70" cy="305" r="50" fill="url(#sglow)"><animate attributeName="r" values="40;58;40" dur="3s" repeatCount="indefinite"/></circle>
-<path transform="translate(70 307) scale(.68)" d="M0-44L12-14L44-12L19 8L28 40L0 22L-28 40L-19 8L-44-12L-12-14Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+<g id="stGlowG" transform="translate(70 305)"><circle id="stGw" r="50" fill="url(#sglow)"><animate attributeName="r" values="40;58;40" dur="3s" repeatCount="indefinite"/></circle><circle id="stGr" r="50" fill="url(#sglowR)" opacity="0"><animate attributeName="r" values="42;57;44;60;42" dur="1.4s" repeatCount="indefinite"/></circle></g>
+<g id="stBody" transform="translate(70 307) scale(.68)"><path id="stPath" d="M0-44L12-14L44-12L19 8L28 40L0 22L-28 40L-19 8L-44-12L-12-14Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></g>
 <text x="70" y="367" text-anchor="middle" font-size="18" fill="#fff">الدافع</text>
 <text x="70" y="389" text-anchor="middle" font-size="18" fill="#fff">الفطري</text>
 </g>
@@ -361,8 +376,8 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 </g>
 
 <g class="el" data-el="orbit">
-<use href="#o1" stroke="#fff" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".55"/>
-<use href="#o2" stroke="#8ee8f4" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".55"/>
+<g class="oA"><path d="M98 283Q130 252 166 278" stroke="#fff" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".75" marker-end="url(#aw)"/><text x="113" y="251" text-anchor="middle" font-size="15" fill="#fff">يوقظ</text></g>
+<g class="oB"><path d="M166 330Q130 358 98 322" stroke="#8ee8f4" stroke-width="2" stroke-dasharray="4 6" fill="none" opacity=".75" marker-end="url(#ac)"/><text x="131" y="374" text-anchor="middle" font-size="15" fill="#8ee8f4">يقوّي</text></g>
 <g id="orbG" class="motion"></g>
 </g>
 
@@ -387,6 +402,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <g class="el" data-el="g1"><use href="#gateG" transform="translate(252 165)"/><g class="badge"><circle cx="322" cy="165" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="322" y="172" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">١</text></g><text x="380" y="171" text-anchor="middle" font-size="16" fill="#4ee0a6">غضّ البصر</text></g>
 <g class="el" data-el="g2"><use href="#gateG" transform="translate(255 431)"/><g class="badge"><circle cx="323" cy="431" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="323" y="438" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">٢</text></g><text x="380" y="437" text-anchor="middle" font-size="16" fill="#4ee0a6">العزيمة</text></g>
 <g class="el" data-el="g3"><path d="M200 712C70 712 20 680 20 560S24 430 46 404" fill="none" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#am)"/><use href="#gateG" transform="translate(255 712)"/><g class="badge"><circle cx="323" cy="712" r="17" fill="#081013" stroke="#4ee0a6" stroke-width="3"/><text x="323" y="719" text-anchor="middle" font-size="19" fill="#4ee0a6" style="stroke:none">٣</text></g><text x="255" y="758" text-anchor="middle" font-size="18" fill="#4ee0a6">التوبة: بداية جديدة</text></g>
+<g id="fxG"></g>
 </svg>
 
 <div class="alt" data-v="drops"><div class="dropsV">
@@ -400,7 +416,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <div class="dropNames" role="group" aria-label="اختر قطرة"><button data-d="mathy">المَذْي</button><button data-d="wadi">الوَدْي</button><button data-d="mani">المَنِيّ</button></div>
 </div></div>
 
-<div class="alt" data-v="fitra"><svg id="fitSvg" viewBox="0 0 400 250" role="img" aria-label="طريق يبتعد تدريجيًا عن خط الفطرة السليمة"></svg></div>
+<div class="alt" data-v="fitra"><svg id="fitSvg" viewBox="0 -22 400 272" role="img" aria-label="طريق يبتعد تدريجيًا عن خط الفطرة السليمة"></svg></div>
 <div class="alt" data-v="balance"><svg viewBox="0 0 400 270" role="img" aria-label="ميزان: ذنبان أثقل من ذنب واحد">
 <g stroke="#e9eef5" stroke-width="4" fill="none" stroke-linecap="round"><path d="M200 44V226"/><path d="M150 230H250"/><path d="M73 87L327 33"/><path d="M73 87L43 147M73 87L103 147"/><path d="M327 33L297 93M327 33L357 93"/></g>
 <circle cx="200" cy="58" r="8" fill="#e9eef5"/>
@@ -487,7 +503,7 @@ const CH=[{n:'البداية',bg:'#0b1216',ac:'#ffd27a'},{n:'كيف تعمل ا�
 /* ---------- questions ---------- */
 const Q={
 doubt:{q:'بعد تفكير، وجدت بللًا ولا تدري: أهو مذي أم مني؟ ماذا تفعل؟',o:[['أغتسل احتياطًا كلما شككت',0,'الاغتسال مع كل شك يفتح باب الوسوسة؛ الأصل أن تميّز بالعلامات.'],['أتذكّر العلامات: هل خرج بدفق ولذة؟ وهل شعرت بعده بفتور؟ وهل هو ثَخين كالعجين، ورائحته كرائحة العجين؟',1,'صحيح. إن وُجدت هذه العلامات فهو مني يوجب الغسل. وإن لم يحدث دفق ولا فتور، وكان رقيقًا لزجًا، فهو مذي: تغسل المكان وتتوضأ.'],['أعتبره منيًا، وأحكم على نفسي بالسقوط',0,'لا تحكم على نفسك دون علامة؛ خروج المذي ليس نزولًا، والشك لا يُبنى عليه.']]},
-when:{q:'متى تكون المقاومة أسهل؟',o:[['عند الذروة، لأنني أشعر بالخطر',0,'الذروة أصعب لحظة، والضغط فيها في أعلى درجاته.'],['في بدايتها، عند أول علامة',1,'صحيح. ولهذا أهم مهارة أن تنتبه متى تبدأ الموجة، فتفعّل حالة الطوارئ قبل أن تعلو. كثير من الناس لا يميّز البداية، فيجد نفسه واقعًا في الذنب ولا يدري متى بدأ الأمر.'],['بعد أن تهبط',0,'بعد الهبوط لا مقاومة أصلًا؛ المهم أن تصل إليه دون سقوط.']]},
+when:{q:'متى تكون المقاومة أسهل؟',o:[['عند الذروة، لأنني أشعر بالخطر',0,'الذروة أصعب لحظة، والضغط فيها في أعلى درجاته.'],['في بدايتها، عند أول علامة',1,'صحيح. ولهذا أهم مهارة أن تنتبه متى تبدأ الموجة، فتقطعها قبل أن تعلو. كثير من الناس لا يميّز البداية، فيجد نفسه واقعًا في الذنب ولا يدري متى بدأ الأمر.'],['بعد أن تهبط',0,'بعد الهبوط لا مقاومة أصلًا؛ المهم أن تصل إليه دون سقوط.']]},
 fluid:{q:'خرج منك سائل شفاف لَزِج بعد تفكير، دون دَفْق ولا لذّة كاملة. ما هو، وما حكمه؟',o:[['مني، ويجب الغسل',0,'المني يخرج بدفق ولذة ويعقبه فتور، وهذا لم يحدث.'],[()=>tr==='y'?'مذي: يُغسل مكانه ويُتوضأ، ولا يُعدّ نزولًا':'مذي: يُغسل مكانه ويُتوضأ، وليس استمناءً',1,'صحيح. فلا تحكم على نفسك بالسقوط، ولا تجعله بابًا لليأس أو الوسوسة. وإن كان سبب الإثارة نظرًا محرمًا، فالذنب في النظر وحده، وتكفيه التوبة.'],['لا شيء عليّ إطلاقًا',0,'المذي نجس: يُغسل مكانه، ويجب الوضوء للصلاة.']]},
 g1:{q:'ظهر لك مقطع فيه تلميحات وأنت تتصفح. ماذا تفعل؟',o:[['أكمل قليلًا لأرى',0,'تلك الثواني القليلة هي التي تُدخل الوقود إلى الخيال.'],['أتجاوزه فورًا، وأبتعد عن المصدر الذي أظهره',1,'صحيح: غضّ البصر من أول لحظة، وهي أسهل بوابة.']]},
 g2:{q:'دخلت الفكرة رغم ذلك، وبدأت تتكرر وأنت وحدك. ماذا تفعل؟',o:[['أبقى مكاني حتى تذهب',0,'البقاء في الظرف نفسه يغذّيها؛ الوحدة نفسها محفز.'],['أفكر فيها قليلًا ثم أتوقف',0,'«قليلًا» يعني أن تترك الفكرة تكبر، وكل لحظة ترفع الضغط.'],['أقطعها، وأغيّر مكاني، وأشغل نفسي بشيء نافع',1,'صحيح: هذه هي العزيمة.']]},
@@ -535,7 +551,7 @@ const feedG=$('feedG');
 const feed=(n,dur,sc,col)=>{feedG.innerHTML=Array.from({length:n},(_,k)=>`<g><g transform="scale(${sc})"><rect x="-8" y="-11" width="16" height="22" rx="4" fill="${col}"/><path d="M-3-5L5 0L-3 5Z" fill="#1a1008"/></g><animateMotion dur="${dur}s" begin="-${(dur*k/n).toFixed(2)}s" repeatCount="indefinite"><mpath href="#beam"/></animateMotion></g>`).join('')};
 /* brain pressure */
 /* thoughts: bubbles gather around the head; static when thinking gets cloudy */
-const TB=[[318,212,20,0],[188,212,21,1],[262,262,16,1],[346,250,20,2],[212,332,18,2],[150,256,18,3],[302,324,19,3],[236,188,15,3],[182,292,15,4],[336,186,15,4],[276,206,15,4]];
+const TB=[[318,212,20,0],[188,212,21,1],[262,262,16,1],[346,250,20,2],[212,332,18,2],[160,244,18,3],[302,324,19,3],[236,188,15,3],[182,292,15,4],[336,186,15,4],[276,206,15,4]];
 const TCOL=[['#8ee8f4','#123c46'],['#4ee0a6','#0f3a33'],['#ffc94d','#3a2f10'],['#ff9f43','#3d2410'],['#ff7a7a','#3d1517']];
 const LOBES=[[0,0,.62],[-.42,-.18,.46],[.42,-.2,.46],[-.2,-.44,.42],[.24,-.42,.42],[-.46,.2,.4],[.44,.2,.4],[0,.34,.44]];
 const f1=v=>v.toFixed(1);
@@ -561,6 +577,27 @@ const legendEl=$('legend');
 {
 legendEl.innerHTML=`<span data-l="1"><svg viewBox="-12 -12 24 24"><g fill="#123c46" stroke="#8ee8f4" stroke-width="1.6"><circle cx="6" cy="7.5" r="1.8"/><circle cy="-1" r="7.5"/></g><path d="M-3.8-1q1.25-2.2 2.5 0t2.5 0t2.5 0" fill="none" stroke="#8ee8f4" stroke-width="1.5" stroke-linecap="round"/></svg>الفقاعات = أفكارك</span>`}
 const legend=n=>legendEl.querySelectorAll('span').forEach(e=>e.classList.toggle('on',+e.dataset.l<=n));
+/* the star: calm, lit, glowing, distorted */
+const SV=[.34,-.28,.2,-.14,.42],SW=[13,-9,16,-11,7],SU=[-.38,.32,-.26,.42,-.22],SM=[.2,-.17,.23,-.15,.19,-.22,.16,-.2,.24,-.18];
+const starD=d=>{const P=[];for(let k=0;k<5;k++){const ao=(-90+72*k+d*SW[k])*Math.PI/180,ro=44*(1+d*SV[k]),ai=(-54+72*k+d*SW[(k+2)%5]*.6)*Math.PI/180,ri=19*(1+d*SU[k]);P.push([ro*Math.cos(ao),ro*Math.sin(ao)],[ri*Math.cos(ai),ri*Math.sin(ai)])}
+let o='';for(let i=0;i<10;i++){const a=P[i],b=P[(i+1)%10],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,m=d*SM[i]*L;o+=`${i?'L':'M'}${a[0].toFixed(1)} ${a[1].toFixed(1)}L${((a[0]+b[0])/2-dy/L*m).toFixed(1)} ${((a[1]+b[1])/2+dx/L*m).toFixed(1)}`}return o+'Z'};
+const mixC=(a,b,t)=>{const q=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)),A=q(a),B=q(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')};
+const starCol=(l,d)=>{const t=Math.max(0,Math.min(1,l));return[mixC(mixC('#26353a','#ffffff',t),'#c9825c',d*.85),mixC(mixC('#7d9195','#ffffff',t),'#ff8b70',d)]};
+const stPath=$('stPath'),stGw=$('stGw'),stGr=$('stGr'),stGlowG=$('stGlowG');
+let stS={l:1,d:0},stA=null;
+const drawStar=()=>{const {l,d}=stS,[f,k]=starCol(l,d),g=.05+.6*Math.min(Math.max(l,0),1)+.35*Math.max(0,l-1)/.45;
+stPath.setAttribute('d',starD(d));stPath.setAttribute('fill',f);stPath.setAttribute('stroke',k);
+stGw.setAttribute('opacity',(g*(1-.75*d)).toFixed(3));stGr.setAttribute('opacity',(g*d*.95).toFixed(3));
+stGlowG.setAttribute('transform',`translate(70 305) scale(${(1+.5*Math.max(0,l-1)/.45).toFixed(3)})`)};
+const starTo=(t,ms=700,cb)=>{const to={l:t.l??stS.l,d:t.d??stS.d};if(stA)cancelAnimationFrame(stA);stA=null;map.classList.toggle('stFlick',to.d>.55);
+if(!ms||reduce){stS=to;drawStar();if(cb)cb();return}
+const fr={...stS},t0=performance.now();const f=now=>{const k=Math.min(1,(now-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;stS={l:fr.l+(to.l-fr.l)*e,d:fr.d+(to.d-fr.d)*e};drawStar();if(k<1)stA=requestAnimationFrame(f);else{stA=null;if(cb)cb()}};stA=requestAnimationFrame(f)};
+drawStar();
+/* sparks travelling between the star and the head */
+const fxG=$('fxG');
+const spark=(pid,col,ms,done)=>{if(reduce){if(done)done();return}const pa=$(pid),L=pa.getTotalLength(),g=document.createElementNS('http://www.w3.org/2000/svg','g');
+g.innerHTML=`<circle r="15" fill="${col}" opacity=".22"/><circle r="7" fill="${col}"/><circle r="3" fill="#fff"/>`;fxG.appendChild(g);const t0=performance.now();
+const f=now=>{if(!g.isConnected)return;const k=Math.min(1,(now-t0)/ms),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,pt=pa.getPointAtLength(e*L);g.setAttribute('transform',`translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)})`);if(k<1)requestAnimationFrame(f);else{g.remove();if(done)done()}};requestAnimationFrame(f)};
 /* orbit */
 const orbG=$('orbG');
 const orbit=dur=>{orbG.innerHTML=['o1','o2'].map((id,k)=>[0,1].map(j=>`<circle r="5" fill="${k?'#8ee8f4':'#fff'}"><animateMotion dur="${dur}s" begin="-${((j/2)*dur+k*dur/4).toFixed(2)}s" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`).join('')).join('')};
@@ -582,16 +619,21 @@ let mA=null;
 const markLoop=()=>{const t0=performance.now();const f=now=>{const t=((now-t0)%6500)/6500;markAt(t);mA=requestAnimationFrame(f)};mA=requestAnimationFrame(f)};
 const markOff=()=>{if(mA)cancelAnimationFrame(mA);mA=null;wMark.setAttribute('opacity',0)};
 /* reset all live map states */
-const resetMap=()=>{shut(false);feed(0,1,1,'#ffc94d');pressure(0);orbit(3.2);markOff()};
+const resetMap=()=>{shut(false);feed(0,1,1,'#ffc94d');pressure(0);orbit(3.2);markOff();map.classList.remove('oStage','o1','o2');fxG.innerHTML=''};
 
 /* fitra drawing */
 const FN=[[350,150,'المعتاد'],[262,138,'أشد'],[176,104,'أغرب'],[92,52,'انتكاس الفطرة']];
-const fitDraw=n=>{const col=['#ffc94d','#ff9f43','#ff7a7a','#ff5d6c'];let path='M380 150',segs='';
+const fitDraw=(n,heal)=>{const col=['#ffc94d','#ff9f43','#ff7a7a','#ff5d6c'];let segs='';
 for(let k=1;k<=n;k++){const [x0,y0]=FN[k-1],[x1,y1]=FN[k];segs+=`<path d="M${x0} ${y0}C${(x0+x1)/2+10} ${y0} ${(x0+x1)/2+10} ${y1} ${x1} ${y1}" fill="none" stroke="${col[k]}" stroke-width="${5+k*1.5}" stroke-linecap="round"/>`}
+const dd=heal?.5:[0,.35,.7,1][n],[sx,sy,lab]=FN[n],[sf,ss]=starCol(1,dd);
 $('fitSvg').innerHTML=`<line x1="20" x2="385" y1="150" y2="150" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="8 8"/><text x="385" y="180" text-anchor="start" font-size="16" fill="#4ee0a6" style="direction:rtl">الفطرة السليمة</text>
 <line x1="380" x2="350" y1="150" y2="150" stroke="${col[0]}" stroke-width="5" stroke-linecap="round"/>${segs}
-${FN.slice(0,n+1).map(([x,y,t],k)=>`<circle cx="${x}" cy="${y}" r="${8+k*2}" fill="${col[k]}" stroke="#061014" stroke-width="3"/><text x="${x}" y="${k===3?y-22:y-18}" text-anchor="middle" font-size="${k===3?18:16}" fill="${col[k]}">${t}</text>`).join('')}
-${n>0?`<line x1="${FN[n][0]}" x2="${FN[n][0]}" y1="${FN[n][1]+14+n*2}" y2="146" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="3 5"/>`:''}`};
+${heal?`<path d="M${sx-14} ${sy+18}C44 78 34 116 40 140" fill="none" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="7 7" marker-end="url(#am)"/>`:''}
+${FN.slice(0,n).map(([x,y,t],k)=>`<circle cx="${x}" cy="${y}" r="${8+k*2}" fill="${col[k]}" stroke="#061014" stroke-width="3"/><text x="${x}" y="${y-18}" text-anchor="middle" font-size="16" fill="${col[k]}">${t}</text>`).join('')}
+${n>0?`<line x1="${sx}" x2="${sx}" y1="${sy+22}" y2="146" stroke="rgba(255,255,255,.35)" stroke-width="2" stroke-dasharray="3 5"/>`:''}
+<circle cx="${sx}" cy="${sy}" r="34" fill="url(#${dd>.45&&!heal?'sglowR':'sglow'})"/>
+<g transform="translate(${sx} ${sy}) scale(.42)"${dd>.55?' class="fflick"':''}><path d="${starD(dd)}" fill="${sf}" stroke="${ss}" stroke-width="5" stroke-linejoin="round"/></g>
+<text x="${sx}" y="${sy-(n===3?37:28)}" text-anchor="middle" font-size="${n===3?18:16}" fill="${col[n]}">${lab}</text>${heal?'<text x="84" y="112" text-anchor="middle" font-size="16" fill="#4ee0a6">العودة</text>':''}`};
 /* ---------- ask helper ---------- */
 let pm=false;
 const ask=(root,key,done)=>{const d=Q[key];let fired=false;
@@ -633,9 +675,14 @@ const S=[
  setP(picked?'التالي ←':'اختر عمرك',NEXT,{locked:!picked,hint:picked?'':'اضغط على عمرك في الأعلى'});
  bs.forEach(b=>b.addEventListener('click',()=>{tr=b.dataset.t;picked=true;mark();save(true);buildProg();nextP({pulse:1,hint:'اضغط «التالي» للمتابعة'})}))}},
 
-{id:'star',ch:1,name:'الدافع الفطري',vis:'map',h:'n',cam:[130,312,290],show:['star'],
- html:()=>`<h2>الشَّرارة: الدافع الفِطري</h2><p>الشهوة دافع خلقه الله في كل إنسان. يأتي ويذهب، ولا يمكن إيقافه.</p><p class="call">وجودها ليس عيبًا فيك. السؤال المهم: ماذا تفعل حين تأتي؟</p>`,
- enter(){nextP()}},
+{id:'star',ch:1,name:'الدافع الفطري',vis:'map',h:'n',cam:[82,322,250],show:['star'],
+ html:()=>`<h2>الشَّرارة: الدافع الفِطري</h2><p>الشهوة دافع خلقه الله في كل إنسان، وليست عيبًا فيك. والنجمة في الرسم هي هذا الدافع.</p><div class="lcard" id="scard" hidden><span class="st" id="schip"></span><b class="lmain" id="smain"></b></div>`,
+ enter(){starTo({l:.06,d:0},0);
+ const show=(chip,col,main)=>{const c=$('scard');c.hidden=false;c.style.setProperty('--c',col);$('schip').textContent=chip;$('smain').textContent=main;if(!reduce&&c.animate)c.animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:380,easing:'ease-out'});reveal(c)};
+ const wait=()=>{setP('…',null,{locked:1});show('تنتظر…','#8ee8f4','لم تفكر فيه، ولم تُغذِّه.');
+  starTo({l:.06},2600,()=>{show('هدأ وحده','#4ee0a6','لم تفعل شيئًا، فهدأ وحده.');$('scard').insertAdjacentHTML('afterend','<p class="call mint" id="send">المشكلة ليست في مجيئه، بل فيما تفعله بعده: <b>تفكيرك هو الذي يكبّره أو يطفئه.</b></p>');reveal($('send'));nextP({pulse:1})})};
+ const come=()=>{starTo({l:1.45},700,()=>starTo({l:1.25},500));show('جاء الدافع','#ffc94d','لم تختر مجيئه، ولا تملك منعه.');setP('لا تفعل شيئًا… انتظر',wait,{pulse:1,hint:'اضغط، وراقب النجمة'})};
+ setP('جاء الدافع',come,{pulse:1,hint:'جرّب بنفسك: اضغط، وراقب النجمة'})}},
 {id:'brain',ch:1,name:'الخيال',vis:'map',h:'n',cam:[262,286,292],show:['brain'],focus:['brain'],
  html:()=>`<h2>الخيال: الأفكار في رأسك</h2><p>تخيّل: أنت وحدك في غرفتك ليلًا، والجوال في يدك… فخطرت لك فكرة.</p>
 <div class="thought" id="thought"><div class="th"><span class="who">تقول لنفسك:</span><span class="st" id="tst"></span></div><span class="say" id="say"></span><span class="ex" id="tex"></span><div class="tbar" id="meter"><span></span><span></span><span></span><span></span><span></span></div></div>`,
@@ -659,23 +706,39 @@ const S=[
  setP('اترك الفكرة تكبر (١ من ٤)',up,{pulse:1,hint:'هذه تجربة: اضغط، وراقب ماذا يحدث في رأسك'})}},
 {id:'eye',ch:1,name:'العين',vis:'map',h:'n',cam:[250,200,380],show:['star','brain','eye','beam'],focus:['eye','beam','brain'],
  html:()=>`<h2>الباب: العين، وكيف تغذّي الخيال</h2><p>الأفكار في رأسك لا تأتي وحدها؛ وقودها الأكبر ما يدخل من العين: مقاطع، وصور، وأغانٍ، وكلام. انظر كيف تتدفّق إليه فتملؤه بالأفكار.</p><div id="after"></div>`,
- enter(){pressure(2);setP('غُضَّ بصرك',()=>{shut(true);pressure(0);$('after').innerHTML='<p class="call mint">لاحظ: حين غضضتَ بصرك توقّف الوقود، فاختفت الأفكار وهدأ رأسك. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
-{id:'loop',ch:1,name:'كيف يصبح إدمانًا',vis:'map',h:'t',cam:[228,312,560],show:['star','eye','beam','brain','orbit','arrow','wave','dline'],
- html:()=>`<h2>الحَلْقة: كيف يصبح إدمانًا؟</h2><p>الدافع يحرّك الخيال، والخيال يستدعي الدافع. أدخل محفزات من العين، ولاحظ الحلقة والموجات.</p><div class="status" id="lst" aria-live="polite"></div>`,
- enter(){const L=[['البداية','دوران هادئ، وموجات قليلة ومتباعدة.',3.2,fMulti(2,.38),0,[0,1,1,'#ffc94d']],['دخل محفز','اشتعل الخيال، وعلت الموجة أكثر من طبيعتها.',2.1,fMulti(3,.6),1,[2,2.2,.85,'#ffc94d']],['التكرار','الحلقة أسرع: الدافع يعود أسرع وأقوى، والموجات تتقارب.',1.2,fMulti(6,.82),2,[3,1.5,1,'#ffc94d']],['التعوّد ثم الإدمان','المعتاد لم يعد يكفي، فيبحث عن الأغرب والأشد. والموجات تتجاوز خط السقوط باستمرار.',.65,fMulti(9,1.02),3,[5,.9,1.3,'#ff7a7a']]];
- let l=0;const paint=()=>{const s=L[l];orbit(s[2]);waveTo(s[3]);pressure(s[4]);feed(...s[5]);$('lst').innerHTML=`<b>${s[0]}:</b> ${s[1]}`;if(l)reveal($('lst'))};waveTo(L[0][3],true);paint();
- const add=()=>{l++;paint();if(l<3)setP(`أدخل محفزًا (${ar(l+1)} من ٣)`,add,{hint:'استمر، ولاحظ سرعة الحلقة وعلو الموجات'});else{$('lst').insertAdjacentHTML('afterend','<p class="call" id="lend">الإدمان يُبنى خطوة خطوة، ويُهدم بالطريقة نفسها: كل مرة تقطع فيها الحلقة تُضعفها.</p>');reveal($('lend'));nextP({pulse:1})}};
- setP('أدخل محفزًا (١ من ٣)',add,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+ enter(){pressure(2);starTo({l:1.2});setP('غُضَّ بصرك',()=>{shut(true);pressure(0);starTo({l:.3},1400);$('after').innerHTML='<p class="call mint">لاحظ: حين غضضتَ بصرك توقّف الوقود، فاختفت الأفكار وهدأ رأسك. أسهل مقاومة هي عند الباب، قبل أن يدخل شيء.</p>';reveal($('after'));nextP({pulse:1})},{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+{id:'wave',ch:1,name:'الموجة',vis:'map',h:'s',cam:[230,505,215],show:['star','eye','beam','brain','arrow','wave'],focus:['wave'],
+ html:()=>`<h2>الموجة</h2><p>الشهوة تأتي كموجة: تبدأ، ثم تعلو، ثم تبلغ ذروتها، ثم تهبط وحدها إن لم تُغذِّها بالتفكير أو النظر.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle);markLoop();onLeave(markOff);ask($('ask'),'when',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+{id:'loop',ch:1,name:'كيف يصبح إدمانًا',vis:'map',h:'t',cam:[190,300,250,460],show:['star','brain'],
+ html:()=>`<h2>الحَلْقة: كيف يصبح إدمانًا؟</h2><div class="lcard" id="lcard"><span class="st" id="lchip"></span><b class="lmain" id="lmain"></b><span class="lvoice" id="lvoice"></span></div>`,
+ enter(){
+ const C={mid:[190,300,250,460],star:[100,305,220,290],brain:[250,298,250,330],both:[172,305,300,470],eye:[205,228,440,460],wide:[220,328,540]};
+ const withO=['star','brain','orbit'],withE=[...withO,'eye','beam'],all=[...withE,'wave','dline','arrow'];
+ const T=[];const later=(f,ms)=>T.push(setTimeout(f,reduce?0:ms));onLeave(()=>T.forEach(clearTimeout));
+ const paintL=(chip,col,main,voice,anim)=>{const c=$('lcard');c.style.setProperty('--c',col);$('lchip').textContent=chip;$('lmain').textContent=main;$('lvoice').innerHTML=voice?`تقول لنفسك: <b>${voice}</b>`:'';if(anim){if(!reduce&&c.animate)c.animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:380,easing:'ease-out'});reveal(c)}};
+ const wait=()=>setP('…',null,{locked:1});
+ const nx=(label,fn)=>setP(label,fn,{hint:'تابع، وراقب الرسم'});
+ map.classList.add('oStage');orbG.innerHTML='';starTo({l:.12,d:0},500);waveTo(fMulti(2,.38),true);
+ paintL('البداية','#8ee8f4','النجمة (الدافع) هادئة، والدماغ (الخيال) هادئ. اضغط، وراقب ما يحدث بينهما.','',false);
+ const s1=()=>{wait();paintL('الدافع يوقظ الخيال','#4ee0a6','جاءت الرغبة، فأيقظت الخيال: خطرت لك فكرة.','',true);cam(C.star);starTo({l:1.2},600);
+  later(()=>{setShow(withO);map.classList.add('o1');cam(C.mid);spark('sp1','#ffffff',1150,()=>{pressure(1,1);nx('فكّرتَ فيها (٢ من ٦)',s2)})},700)};
+ const s2=()=>{wait();paintL('الخيال يقوّي الدافع','#ffc94d','فكّرتَ فيها، فاشتدّت الرغبة أكثر.','',true);cam(C.brain);pressure(2);
+  later(()=>{map.classList.add('o2');cam(C.mid);spark('sp2','#8ee8f4',1150,()=>{starTo({l:1.5},260,()=>starTo({l:1.3},600));nx('استمرّت تدور (٣ من ٦)',s3)})},900)};
+ const s3=()=>{paintL('حلقة تدور','#ffc94d','كلٌّ منهما يغذّي الآخر: الرغبة تجلب الأفكار، والأفكار تزيد الرغبة.','',true);map.classList.remove('oStage','o1','o2');orbit(2.4);cam(C.both);nx('شاهدتَ مقطعًا (٤ من ٦)',s4)};
+ const s4=()=>{paintL('وقود من العين','#ff9f43','المحفزات، أي ما تراه وتسمعه، وقود يسرّع الحلقة.','«مقطع واحد فقط.»',true);setShow(withE);cam(C.eye);feed(2,2.2,.85,'#ffc94d');orbit(1.6);pressure(3);starTo({l:1.4});nx('تكرّر ذلك أيامًا (٥ من ٦)',s5)};
+ const s5=()=>{paintL('التكرار','#ff9f43','مع التكرار تعود الرغبة أسرع وأقوى، وتتقارب الموجات.','«سأتوقف غدًا.»',true);setShow(all);cam(C.wide);waveTo(fMulti(6,.82));feed(3,1.5,1,'#ffc94d');orbit(1.1);starTo({l:1.4,d:.15});nx('بعد شهور… (٦ من ٦)',s6)};
+ const s6=()=>{paintL('الإدمان','#ff7a7a','المعتاد لم يعد يكفي، والموجات تتجاوز خط السقوط، وحتى الدافع نفسه تشوّه.','«لم يعد يكفيني.»',true);waveTo(fMulti(9,1.02));feed(5,.9,1.3,'#ff7a7a');orbit(.6);pressure(4);starTo({l:1.3,d:1},1600);setP('اكسر الحلقة',s7,{pulse:1,hint:'الآن جرّب: اكسرها'})};
+ const s7=()=>{paintL('كسرتَ الحلقة','#4ee0a6','غضضتَ بصرك وقطعتَ الفكرة، فتباطأت الحلقة وهدأت الموجات.','',true);shut(true);pressure(1,0);orbit(3.6);waveTo(fMulti(2,.38));starTo({l:.75,d:.4},1800);
+  $('lcard').insertAdjacentHTML('afterend','<p class="call mint" id="lend">كل مرة تكسر فيها الحلقة تُضعفها. لكن لاحظ النجمة: أثر التشوّه لا يزول في لحظة، بل تتعافى بالتدريج.</p>');reveal($('lend'));nextP({pulse:1})};
+ setP('جاء الدافع (١ من ٦)',s1,{pulse:1,hint:'هذه قصة قصيرة: اضغط، وراقب النجمة والدماغ'})}},
 {id:'fitra',ch:1,only:'o',name:'انتكاس الفطرة',vis:'fitra',h:'n',
- html:()=>`<h2>التعوّد: انتِكاس الفِطرة</h2><p>مع كثرة التعوّد على المحفزات، لا يعود المعتاد يكفي، فيبحث الشخص عمّا هو أشد ثم أغرب. وكل خطوة تبعده أكثر عن الفطرة السليمة.</p><div class="status" id="fst" aria-live="polite"></div>`,
+ html:()=>`<h2>التعوّد: انتِكاس الفِطرة</h2><p>مع كثرة التعوّد على المحفزات، لا يعود المعتاد يكفي، فيبحث الشخص عمّا هو أشد ثم أغرب. وكل خطوة تبعده عن الفطرة السليمة، وتزيد تشوّه النجمة.</p><div class="status" id="fst" aria-live="polite"></div>`,
  enter(){const T=['في البداية يكفيه القليل، وطريقه قريب من الفطرة.','المعتاد لم يعد يُثير كما كان، فيبحث عن الأشد.','حتى الأشد صار عاديًا، فينجرف إلى الأغرب.','وصل إلى ما كان يستنكره من قبل: انتكست الفطرة وانحرفت الميول.'];
  let n=0;const paint=()=>{fitDraw(n);$('fst').innerHTML=T[n]};paint();
- const more=()=>{n++;paint();reveal($('fst'));if(n<3)setP(`تعوّد أكثر (${ar(n+1)} من ٣)`,more,{hint:'استمر، ولاحظ ابتعاد الطريق عن الفطرة'});else{$('fst').insertAdjacentHTML('afterend','<p class="call mint" id="fend">وكما انحرف الطريق بالتدريج، يعود بالتدريج: كل مرة تترك فيها المحفز تقرّبك من الفطرة من جديد.</p>');reveal($('fend'));nextP({pulse:1})}};
+ const heal=()=>{fitDraw(3,true);$('fst').insertAdjacentHTML('afterend','<p class="call mint" id="fend">وكما انحرف الطريق بالتدريج، يعود بالتدريج: كل مرة تترك فيها المحفز تقرّبك من الفطرة، وتتعافى النجمة شيئًا فشيئًا.</p>');reveal($('fend'));nextP({pulse:1})};
+ const more=()=>{n++;paint();reveal($('fst'));if(n<3)setP(`تعوّد أكثر (${ar(n+1)} من ٣)`,more,{hint:'استمر، ولاحظ الطريق والنجمة'});else setP('ابدأ العودة',heal,{pulse:1,hint:'اضغط، وراقب الطريق والنجمة'})};
  setP('تعوّد أكثر (١ من ٣)',more,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
-{id:'wave',ch:1,name:'الموجة',vis:'map',h:'s',cam:[230,505,215],show:['star','eye','beam','brain','orbit','arrow','wave'],focus:['wave'],
- html:()=>`<h2>الموجة</h2><p>الشهوة تأتي كموجة: تبدأ، ثم تعلو، ثم تبلغ ذروتها، ثم تهبط وحدها إن لم تُغذَّ.</p><div class="ask" id="ask"></div>`,
- enter(){waveTo(fSingle);markLoop();onLeave(markOff);ask($('ask'),'when',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
-
 {id:'fallY',ch:2,only:'y',name:'النزول',vis:'map',h:'n',cam:[252,566,262],show:['star','eye','beam','brain','orbit','arrow','wave','fallY'],focus:['fallY','wave'],
  html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول.</p><p class="call">النزول هو خروج المَنِيّ.</p><p>وخروج المني في غير الزواج، أو في غير الاحتِلام أثناء النوم، غير صحيح ومحرّم، ويضرّك نفسيًا وذهنيًا.</p><p class="call warn">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>`,
  enter(){waveTo(fSingle,true);nextP()}},
@@ -685,7 +748,7 @@ const S=[
  const got=new Set();const upd=()=>{if(got.size<2)setP(`اضغط الطريقين (${ar(got.size)} من ٢)`,null,{locked:1,hint:'اضغط «فردي» ثم «مع آخرين» في الأعلى'});else{if(!$('endC')){$('panes').insertAdjacentHTML('afterend','<p class="call warn" id="endC">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>');reveal($('endC'))}nextP({pulse:1})}};
  card.querySelectorAll('.two button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.p;card.querySelectorAll('.two button').forEach(x=>x.classList.toggle('on',x===b));setShow(this.show,['fall'+k]);if(!got.has(k)){got.add(k);$('panes').insertAdjacentHTML('beforeend',`<div class="paneX">${T[k]}</div>`);reveal($('panes').lastElementChild)}upd()}));upd()}},
 {id:'double',ch:2,only:'o',name:'لا تجعل ذنبك ذنبين',vis:'balance',h:'n',
- html:()=>`<h2>لا تجعل ذنبك ذنبين</h2><p>الذي يُطفئ الموجة هو النزول، لا المشاهدة. فالمشاهدة ذنب مستقل يزيد الضرر على الدماغ ويغذّي الحلقة. فمن غلبته الموجة، فلا يُضِفْ إليها ذنب المشاهدة.</p><p class="call warn">هذا تخفيف للضرر فقط، وليس الحل. الحل الجذري هو الترك.</p>`,
+ html:()=>`<h2>لا تجعل ذنبك ذنبين</h2><p>إن غلبتك الموجة يومًا، فلا تزد على ذنبك ذنب المشاهدة؛ فهي التي تغذّي الحلقة وتضرّ الدماغ أكثر.</p><p class="call warn">هذا ليس عذرًا ولا حلًا. <b>الحل هو الترك.</b></p>`,
  enter(){nextP()}},
 {id:'drops',ch:2,name:'السوائل الثلاثة',vis:'drops',h:'n',
  html:()=>`<h2>ليس كل ما يخرج نزولًا</h2><p>قد يخرج سائل عند الإثارة، فيظن البعض أنه ${tr==='y'?'وقع في الذنب أو حصل منه النزول':'وقع في الاستمناء'}. تعرّف على السوائل الثلاثة.</p><div class="dinfo" id="dinfo"></div>`,
@@ -715,8 +778,8 @@ const S=[
  html:()=>`<h2>البوابة ٢: العزيمة</h2><p>اقطع الفكرة في أولها، وغيّر مكانك، واشغل نفسك بما ينفع، واخرج من الوحدة.</p><div class="ask" id="ask"></div>`,
  enter(){waveTo(fSingle,true);ask($('ask'),'g2',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
 {id:'g3',ch:3,name:'البوابة ٣: التوبة',vis:'map',h:'s',cam:[200,590,430],show:MAPALL,focus:['g3','fallS','fallG','star'],
- html:()=>`<h2>البوابة ٣: التوبة</h2><p>إن وقعت فلا تيأس. التوبة ليست جلدًا للذات، بل بداية جديدة تعيدك إلى أول الطريق أقوى.</p><div class="ask" id="ask"></div>`,
- enter(){waveTo(fSingle,true);ask($('ask'),'g3',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
+ html:()=>`<h2>البوابة ٣: التوبة</h2><p>إن وقعت فلا تيأس. التوبة ليست جلدًا للذات، بل بداية جديدة تعيدك إلى أول الطريق أقوى.</p><p class="call mint">لاحظ النجمة في الرسم: بالتوبة تعود سليمة مضيئة.</p><div class="ask" id="ask"></div>`,
+ enter(){waveTo(fSingle,true);const t=setTimeout(()=>{cam([118,440,340]);starTo({l:1.5,d:0},1900,()=>starTo({l:1},800))},reduce?0:1100);onLeave(()=>clearTimeout(t));ask($('ask'),'g3',()=>nextP({pulse:1}));setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
 {id:'levels',ch:3,name:'ما يرفع وما يهدّئ',vis:'map',h:'s',cam:[230,498,230],show:['wave','dline','arrow','fallS','fallG'],focus:['wave','dline'],
  html:()=>`<h2>ما يرفع الموجة، وما يهدّئها</h2><p>اضغط أي عنصر، وانظر أثره على الموجة. والعلاج يختلف من شخص لآخر.</p>
 <p class="grpT" style="color:var(--gold)">المحفزات: ترفعها</p><div class="chips up"><button data-v="14">النظر</button><button data-v="18">العلاقات المحرمة</button><button data-v="10">كثرة الكلام الجنسي</button><button data-v="14">الخلوة بغير الصالحين</button><button data-v="10">الفراغ</button><button data-v="10">الوحدة</button><button data-v="8">السهر</button><button data-v="12">الجوال في غرفة النوم</button></div>
@@ -724,7 +787,7 @@ const S=[
  enter(){let L=45,n=0;waveTo(fLevel(L),true);card.querySelectorAll('.chips button').forEach(b=>b.addEventListener('click',()=>{L=Math.max(8,Math.min(108,L+ +b.dataset.v));waveTo(fLevel(L));n++;if(n===3)nextP({pulse:1})}));
  setP('التالي ←',NEXT,{hint:'جرّب الضغط على العناصر، ثم تابع'})}},
 {id:'reflect',ch:3,name:'وقفة مع نفسك',vis:'map',h:'s',cam:[310,505,210],show:['wave','arrow'],focus:['wave'],
- html:()=>`<h2>وقفة مع نفسك</h2><p>ما أول علامة تسبق الموجة عندك؟ اختر ما ينطبق عليك، بينك وبين نفسك.</p><div class="chips" id="signs">${['الوحدة','الملل','السهر','التوتر','الجوال في السرير','بعد مشاهدة شيء','الحزن','الفراغ'].map(x=>`<button aria-pressed="false">${x}</button>`).join('')}</div><p class="priv" style="margin-top:10px">لا يُحفظ شيء مما تختاره. معرفة علاماتك هي أول خطوة لتفعيل حالة الطوارئ في وقتها.</p>`,
+ html:()=>`<h2>وقفة مع نفسك</h2><p>ما أول علامة تسبق الموجة عندك؟ اختر ما ينطبق عليك، بينك وبين نفسك.</p><div class="chips" id="signs">${['الوحدة','الملل','السهر','التوتر','الجوال في السرير','بعد مشاهدة شيء','الحزن','الفراغ'].map(x=>`<button aria-pressed="false">${x}</button>`).join('')}</div><p class="priv" style="margin-top:10px">لا يُحفظ شيء مما تختاره. معرفة علاماتك تجعلك تنتبه مبكرًا، فتقطع الطريق في أوله.</p>`,
  enter(){waveTo(fSingle,true);markAt(.16,'هنا تبدأ','#4ee0a6');card.querySelectorAll('#signs button').forEach(b=>b.addEventListener('click',()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true')));nextP()}},
 
 {id:'tell',ch:4,name:'استر أم أخبر',vis:'split',h:'n',
@@ -741,7 +804,7 @@ const S=[
  enter(){ask($('ask'),'sc2',()=>{$('after').innerHTML='<p class="call">ومن تعرفه منخرطًا في هذه الأمور ووصل فيها مراحل بعيدة، أبعِدْه عن بيتك وأهلك، فلا تضمن كيف ينظر إليهم.</p>';reveal($('after'));nextP({pulse:1})});setP('اختر إجابة من الأعلى',null,{locked:1,hint:'اضغط على إحدى الإجابات'})}},
 
 {id:'end',ch:5,name:'الخاتمة',vis:'map',h:'t',cam:FULL,show:MAPALL,
- html:()=>`<h2>الطريق كاملًا</h2><ul class="sum"><li><b style="color:var(--cyan)">الخيال</b>: أفكار في رأسك؛ كلما تركتها تكبر ارتفع الضغط.</li><li><b style="color:var(--gold)">العين</b> باب: ما يدخل منها وقود للخيال.</li><li><b style="color:var(--sea)">الموجة</b> تمرّ إن صبرت؛ انتبه لبدايتها.</li><li><b style="color:var(--mint)">البوابات:</b> غضّ البصر، والعزيمة، والتوبة.</li></ul><p class="call">باب التوبة مفتوح دائمًا، ومن سقط ثم قام فقد انتصر.</p><p class="priv" style="margin-top:10px">إن احتجت أن تتكلم، فاختر شخصًا تثق به، ولا تحمل الأمر وحدك.</p><button class="link" id="toMenu">راجع أي مرحلة من القائمة</button>`,
+ html:()=>`<h2>الطريق كاملًا</h2><ul class="sum"><li><b style="color:#fff">الدافع</b> فطري: لا تملك منع مجيئه، لكن تفكيرك يكبّره أو يطفئه.</li><li><b style="color:var(--cyan)">الخيال</b>: أفكار في رأسك؛ كلما تركتها تكبر ارتفع الضغط.</li><li><b style="color:var(--gold)">العين</b> باب: ما يدخل منها وقود للخيال.</li><li><b style="color:var(--sea)">الموجة</b> تمرّ إن صبرت؛ انتبه لبدايتها.</li><li><b style="color:var(--coral)">الحلقة</b>: الدافع والخيال يغذّي كلٌّ منهما الآخر، وكل مرة تكسرها تُضعفها.</li><li><b style="color:var(--mint)">البوابات:</b> غضّ البصر، والعزيمة، والتوبة.</li></ul><p class="call">باب التوبة مفتوح دائمًا، ومن سقط ثم قام فقد انتصر.</p><p class="priv" style="margin-top:10px">إن احتجت أن تتكلم، فاختر شخصًا تثق به، ولا تحمل الأمر وحدك.</p><button class="link" id="toMenu">راجع أي مرحلة من القائمة</button>`,
  enter(){waveTo(fSingle,true);setP('ابدأ الرحلة من جديد',()=>go(0,-1));$('toMenu').addEventListener('click',openSheet)}}
 ];
 const list=()=>S.filter(s=>!s.only||s.only===tr);
@@ -759,6 +822,7 @@ const paintProg=()=>{const L=list(),s=L[cur];[...prog.children].forEach((seg,k)=
 
 /* ---------- navigation ---------- */
 let lastCh=-1,bnT=null;
+const starDef=i=>{const L=list(),a=L.findIndex(x=>x.id==='loop'),b=L.findIndex(x=>x.id==='g3');return i>a&&i<=b?{l:.8,d:.4}:{l:1,d:0}};
 const go=(i,dir=1)=>{const L=list();i=Math.max(0,Math.min(i,L.length-1));leaveFns.forEach(f=>f());leaveFns=[];
 cur=i;const s=L[i];seen.add(s.id);
 const c=CH[s.ch];document.body.style.backgroundColor=c.bg;document.documentElement.style.setProperty('--ac',c.ac);document.documentElement.style.setProperty('--bg',c.bg);
@@ -766,7 +830,7 @@ $('chName').textContent=s.ch?`${ar(s.ch)} · ${c.n}`:c.n;$('count').textContent=
 paintProg();
 visual.dataset.h=s.h||'n';if(mq.matches)scrollTo(0,0);layoutStep(s.h,dir!==0);
 const isMap=s.vis==='map';visual.classList.toggle('altOn',!isMap);document.querySelectorAll('.alt').forEach(a=>a.classList.toggle('on',a.dataset.v===s.vis));
-if(isMap){resetMap();setShow(s.show||[],s.focus,s.ghost);cam(s.cam||FULL,dir===0)}
+if(isMap){resetMap();setShow(s.show||[],s.focus,s.ghost);cam(s.cam||FULL,dir===0);starTo(starDef(i),dir===0?0:700)}
 legend(0);card.innerHTML=s.html();card.scrollTop=0;
 if(!reduce&&card.animate)card.animate([{opacity:0,transform:`translateX(${dir<0?28:-28}px)`},{opacity:1,transform:'none'}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)'});
 back.disabled=i===0;
