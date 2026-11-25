@@ -122,6 +122,15 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 .ends button.done small::before{content:"✓ "}
 .hst{min-height:1.7em;margin:8px 0 0;font-size:14.5px;font-weight:700;color:#4ee0a6;text-align:center}
 .hst:empty{min-height:0;margin:0}
+.calm{margin-top:10px;text-align:center}
+.calm>p{margin:0 0 6px;font-size:13.5px;font-weight:700;color:var(--muted)}
+.cbars{display:flex;align-items:flex-end;justify-content:center;gap:18px;min-height:52px}
+.cb{display:flex;flex-direction:column;align-items:center;gap:3px;animation:fin .4s ease}
+.cb i{display:block;width:26px;border-radius:6px 6px 3px 3px;background:linear-gradient(#ffa594,#ff7a7a)}
+.cb span{font-size:12.5px;font-weight:700;color:#ffa594}
+.ends .nz.wait{opacity:.55}
+.ends .nz.again{animation:nzp 1.1s ease-in-out infinite}
+@keyframes nzp{50%{box-shadow:0 0 0 5px rgba(255,122,122,.3)}}
 .ekey p{display:flex;align-items:center;gap:8px;margin:8px 0 0;font-size:15px;line-height:1.55;animation:fin .4s ease}
 .ekey svg{width:26px;height:12px;flex:none}
 .ekey b{white-space:nowrap}
@@ -757,19 +766,17 @@ const S=[
  setP('تعوّد أكثر (١ من ٣)',more,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
 {id:'ends',ch:2,name:'نهاية الموجة',vis:'map',h:'t',cam:[222,392,390,440],show:['star','brain','orbit','wave','dline'],
  html:()=>`<h2>كيف تنتهي الموجة؟</h2><p>أنت في قمّة الموجة، ولها نهايتان: أن تصبر حتى تمرّ، أو النزول (خروج المَنِيّ). جرّب الاثنتين، وقارن.</p>
-<div class="ends"><button class="hold" id="hold"><i class="fill"></i><b>اصبر حتى تمرّ</b><small>اضغط مطوّلًا</small></button><button class="nz" id="nzB"><b>النزول</b><small>اضغط مرة</small></button></div>
-<p class="hst" id="hst" aria-live="polite"></p><div class="ekey" id="eout"></div>`,
+<div class="ends"><button class="hold" id="hold"><i class="fill"></i><b>اصبر حتى تمرّ</b><small>اضغط مطوّلًا</small></button><button class="nz" id="nzB"><b>النزول</b><small>اضغط</small></button></div>
+<p class="hst" id="hst" aria-live="polite"></p><div class="calm" id="calm" hidden><p>مدة الهدوء بعد كل نزول</p><div class="cbars" id="cbars"></div></div><div class="ekey" id="eout"></div>`,
  enter(){
  const G=(t,c,h,sd)=>h*Math.exp(-((t-c)**2)/(2*sd*sd)),TP=.2;
  const cur=t=>.04+(t<=TP?G(t,TP,.78,.07):G(t,TP,.78,.1));
- const cliff=t=>t<=TP?cur(t):t<TP+.035?.04+.78*(1-(t-TP)/.035):.04;
  const fP=t=>.04+G(t,.68,.4,.06)+G(t,.92,.28,.05);
- const fN=t=>.04+[.52,.62,.72,.82,.92].reduce((a,c,k)=>a+G(t,c,.8+k*.05,.03),0);
  const T=[];const later=(f,ms)=>T.push(setTimeout(f,reduce?0:ms));
  const hold=$('hold'),nzB=$('nzB'),hst=$('hst');
- const tried=new Set();let busy=false,hp=0,holding=false,raf=null,last=0,lvl=-1,atPeak=true;
+ const tried=new Set();let busy=false,hp=0,holding=false,raf=null,last=0,lvl=-1,atPeak=true,nzK=0;
  onLeave(()=>{T.forEach(clearTimeout);if(raf)cancelAnimationFrame(raf)});
- const fut=(id,fn)=>{const el=$(id),t0=performance.now();const draw=k=>{let d='';for(let i=0;i<=80;i++){const t=.47+i/80*.53,v=.04+(fn(t)-.04)*k;d+=(i?'L':'M')+wX(t).toFixed(1)+' '+wY(v).toFixed(1)}el.setAttribute('d',d)};if(reduce){draw(1);return}const f=now=>{const k=Math.min(1,(now-t0)/1000),e=1-Math.pow(1-k,3);draw(e);if(k<1&&el.isConnected)requestAnimationFrame(f)};requestAnimationFrame(f)};
+ const fut=(id,fn,ts=.47)=>{const el=$(id),t0=performance.now(),M=Math.round(170*(1-ts));const draw=k=>{let d='';for(let i=0;i<=M;i++){const t=ts+i/M*(1-ts),v=.04+(fn(t)-.04)*k;d+=(i?'L':'M')+wX(t).toFixed(1)+' '+wY(v).toFixed(1)}el.setAttribute('d',d)};if(reduce){draw(1);return}const f=now=>{const k=Math.min(1,(now-t0)/1000),e=1-Math.pow(1-k,3);draw(e);if(k<1&&el.isConnected)requestAnimationFrame(f)};requestAnimationFrame(f)};
  const setLvl=k=>{if(k===lvl)return;lvl=k;pressure(k);orbit([3.4,2.6,1.8,1.2][k])};
  const peak=()=>{waveTo(cur);markAt(TP,'أنت هنا','#ffc94d');starTo({l:1.35},400);lvl=-1;setLvl(3);atPeak=true};
  const out=(k,html)=>{const c=k==='p'?'#4ee0a6':'#ff7a7a';$('eout').insertAdjacentHTML('beforeend',`<p><svg viewBox="0 0 26 12"><path d="M1 6H25" stroke="${c}" stroke-width="3"${k==='p'?' stroke-dasharray="5 4"':''} fill="none"/></svg><span>${html}</span></p>`);reveal($('eout'))};
@@ -784,20 +791,37 @@ const S=[
   try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}
   out('p','<b style="color:#4ee0a6">بعد الصبر:</b> هدأت وحدها، والموجات التالية أضعف وأبعد.');check()};
  const tick=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;hp=holding?Math.min(1,hp+dt/HOLD):Math.max(0,hp-dt*.15);apply();if(hp>=1){raf=null;doneP();return}raf=(holding||hp>0)?requestAnimationFrame(tick):null};
- const start=e=>{e.preventDefault();if(busy||tried.has('p')||holding)return;if(e.pointerId!=null)try{hold.setPointerCapture(e.pointerId)}catch(_){}
+ const start=e=>{e.preventDefault();if(nzK>0&&!tried.has('n')){hst.style.color='#ffc94d';hst.textContent='أكمل تجربة النزول أولًا';return}if(busy||tried.has('p')||holding)return;if(e.pointerId!=null)try{hold.setPointerCapture(e.pointerId)}catch(_){}
   if(!atPeak)peak();holding=true;hold.classList.add('on');if(!raf){last=performance.now();raf=requestAnimationFrame(tick)}};
  const stop=()=>{if(!holding)return;holding=false;hold.classList.remove('on');apply()};
  hold.addEventListener('pointerdown',start);['pointerup','pointercancel','lostpointercapture'].forEach(v=>hold.addEventListener(v,stop));
  hold.addEventListener('contextmenu',e=>e.preventDefault());
  hold.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat)start(e)});hold.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')stop()});
- /* النزول: a sudden drop, then the rebound */
- const nz=()=>{if(busy||holding||tried.has('n'))return;busy=true;hp=0;hold.style.setProperty('--p',0);hst.textContent='';
-  const run=()=>{atPeak=false;markAt(TP,'النزول','#ff7a7a');starTo({l:1.7},160,()=>starTo({l:0},320));waveTo(cliff);setLvl(0);
-   later(()=>{markAt(TP+.045,'هدأت… لحظات','#ff7a7a');hst.style.color='#ff7a7a';hst.textContent='انطفأت الرغبة… لحظات'},700);
-   later(()=>{markOff();starTo({l:1.45,d:Math.min(1,stS.d+.15)},1200);pressure(2,4);lvl=-1;orbit(.9);fut('futN',fN);$('futQ').setAttribute('opacity',0);
-    tried.add('n');nzB.classList.add('done');nzB.querySelector('small').textContent='جرّبته';busy=false;
-    hst.textContent='';out('n','<b style="color:#ff7a7a">بعد النزول:</b> هدأت لحظات، ثم عادت أسرع وأقوى.');check()},2200)};
-  if(!atPeak){peak();later(run,750)}else run()};
+ /* النزول: pressed again and again; each time the calm is shorter */
+ const NR=[[.2,.78],[.42,.86],[.58,.93],[.69,.99],[.77,1.03]],RT=[3500,2300,1400,800],TAIL=[[.83,1.05],[.88,1.06],[.93,1.07],[.97,1.07]];
+ const sdOf=i=>i?Math.min(.07,(NR[i][0]-NR[i-1][0])*.35):.07;
+ const cutW=(t,c,h,sd)=>t<=c?G(t,c,h,sd):t<c+.02?h*(1-(t-c)/.02):0;
+ const nzF=(n,p,tail)=>t=>{let v=.04;for(let i=0;i<=n;i++)v+=cutW(t,NR[i][0],NR[i][1],sdOf(i));
+  if(p>0&&n+1<NR.length){const [c,h]=NR[n+1];v+=t<=c?G(t,c,h*p,sdOf(n+1)):G(t,c,h*p,.1)}
+  if(tail)TAIL.forEach(([c,h])=>{v+=cutW(t,c,h,.022)});return v};
+ let nzRaf=null;onLeave(()=>{if(nzRaf)cancelAnimationFrame(nzRaf)});
+ const sec=ms=>ar((ms/1000).toFixed(1)).replace('.','٫')+' ث';
+ const bar=R=>{$('calm').hidden=false;$('cbars').insertAdjacentHTML('beforeend',`<div class="cb"><i style="height:${Math.round(6+44*R/RT[0])}px"></i><span>${sec(R)}</span></div>`)};
+ const finishN=()=>{tried.add('n');nzB.classList.remove('again','wait');nzB.classList.add('done');nzB.querySelector('small').textContent='جرّبته';busy=false;
+  fut('futN',nzF(NR.length-1,0,true),TP);markAt(NR[4][0],'عادت أسرع','#ff7a7a');hst.textContent='';
+  out('n','<b style="color:#ff7a7a">بعد النزول:</b> كانت تهدأ لحظات، ثم تعود أسرع وأقوى في كل مرة.');check()};
+ const nz=()=>{if(busy||holding||tried.has('n'))return;busy=true;hp=0;hold.style.setProperty('--p',0);nzB.classList.remove('again');nzB.classList.add('wait');
+  const run=()=>{atPeak=false;$('futQ').setAttribute('opacity',0);const k=nzK,c=NR[k][0];
+   markAt(c,'النزول','#ff7a7a');starTo({l:1.7},140,()=>starTo({l:0},300));waveTo(nzF(k,0));setLvl(0);
+   hst.style.color='#ff7a7a';hst.textContent=k?'انطفأت… مرة أخرى':'انطفأت الرغبة…';nzB.querySelector('small').textContent='…';
+   later(()=>{markOff();hst.textContent='الرغبة تعود…';const R=RT[k],t0=performance.now(),d0=stS.d,d1=Math.min(1,d0+.06);
+    const f=now=>{if(!nzB.isConnected)return;const q=Math.min(1,(now-t0)/R);waveTo(nzF(k,q),true);starTo({l:1.45*q,d:d0+(d1-d0)*q},0);setLvl(q<.35?0:q<.65?1:q<.9?2:3);
+     if(q<1){nzRaf=requestAnimationFrame(f);return}nzRaf=null;nzK=k+1;bar(R);markAt(NR[k+1][0],'عادت!','#ff7a7a');
+     if(nzK<RT.length){busy=false;nzB.classList.remove('wait');nzB.classList.add('again');nzB.querySelector('small').textContent='عادت! اضغط مجددًا';hst.textContent=`عادت بعد ${sec(R)}`;reveal(hst);
+      setP('أكمل التجربة',null,{locked:1,hint:'عادت الرغبة… اضغط «النزول» مرة أخرى'})}
+     else later(finishN,500)};
+    nzRaf=requestAnimationFrame(f)},550)};
+  if(!atPeak&&nzK===0){peak();later(run,750)}else run()};
  nzB.addEventListener('click',nz);
  waveTo(cur,true);markAt(TP,'أنت هنا','#ffc94d');starTo({l:1.35},500);setLvl(3);$('futQ').setAttribute('opacity',1);
  setP('جرّب الطريقين في الأعلى',null,{locked:1,hint:'ابدأ بالصبر: اضغط مطوّلًا على «اصبر حتى تمرّ»'})}},
