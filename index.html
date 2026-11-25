@@ -111,6 +111,21 @@ svg text{font-family:"Cairo","IBM Plex Sans Arabic",sans-serif;font-weight:700}
 .thought .ex:empty{display:none}
 .card>.thought{margin-top:22px}
 .thought .tbar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;margin-top:10px}
+.ends{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;margin-top:12px}
+.ends button{position:relative;overflow:hidden;min-height:62px;border-radius:16px;padding:8px 10px;background:#0d171b;color:#fff;font:800 17px/1.35 "Cairo",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.ends button b,.ends button small{position:relative;pointer-events:none}
+.ends button small{font:600 12.5px/1.4 "IBM Plex Sans Arabic",sans-serif;color:var(--muted)}
+.ends .hold{border:1.5px solid #4ee0a6}
+.ends .hold .fill{position:absolute;inset:0;background:linear-gradient(270deg,rgba(78,224,166,.42),rgba(78,224,166,.2));transform:scaleX(var(--p,0));transform-origin:right;pointer-events:none}
+.ends .hold.on{box-shadow:0 0 0 4px rgba(78,224,166,.22)}
+.ends .nz{border:1.5px solid #ff7a7a}
+.ends button.done small::before{content:"✓ "}
+.hst{min-height:1.7em;margin:8px 0 0;font-size:14.5px;font-weight:700;color:#4ee0a6;text-align:center}
+.hst:empty{min-height:0;margin:0}
+.ekey p{display:flex;align-items:center;gap:8px;margin:8px 0 0;font-size:15px;line-height:1.55;animation:fin .4s ease}
+.ekey svg{width:26px;height:12px;flex:none}
+.ekey b{white-space:nowrap}
+.paneX.ok{background:rgba(78,224,166,.08);border-color:rgba(78,224,166,.4)}
 .lcard{--c:#8ee8f4;margin-top:12px;border-radius:18px;padding:10px 16px 13px;background:color-mix(in srgb,var(--c) 8%,#0d171b);border:1.5px solid color-mix(in srgb,var(--c) 55%,transparent);transition:border-color .4s,background-color .4s}
 .lcard .st{display:inline-block;font:800 13px/1.7 "Cairo",sans-serif;color:#081013;background:var(--c);border-radius:99px;padding:0 11px;transition:background-color .4s}
 .lcard .lmain{display:block;font:700 17px/1.7 "Cairo",sans-serif;color:#fff;margin-top:6px}
@@ -392,6 +407,7 @@ html.snap .side{transition:padding-top .45s cubic-bezier(.2,.7,.2,1)}
 <path id="wFill" fill="url(#wv)"/>
 <path id="wLine" fill="none" stroke="#4aa8e8" stroke-width="3" stroke-linejoin="round"/>
 <text x="230" y="574" text-anchor="middle" font-size="18" fill="#4aa8e8">الموجة</text>
+<path id="futP" fill="none" stroke="#4ee0a6" stroke-width="3" stroke-dasharray="7 6" stroke-linejoin="round"/><path id="futN" fill="none" stroke="#ff7a7a" stroke-width="3" stroke-linejoin="round"/><text id="futQ" x="150" y="528" text-anchor="middle" font-size="17" fill="#9fb3b0" opacity="0">ماذا بعد؟</text>
 <g class="wmk" id="wMark" opacity="0"><line id="wmL" stroke-width="2" stroke-dasharray="4 5"/><circle id="wmC" r="9" stroke="#061014" stroke-width="3"/><text id="wmT" text-anchor="middle" font-size="17"></text></g>
 </g>
 
@@ -619,7 +635,7 @@ let mA=null;
 const markLoop=()=>{const t0=performance.now();const f=now=>{const t=((now-t0)%6500)/6500;markAt(t);mA=requestAnimationFrame(f)};mA=requestAnimationFrame(f)};
 const markOff=()=>{if(mA)cancelAnimationFrame(mA);mA=null;wMark.setAttribute('opacity',0)};
 /* reset all live map states */
-const resetMap=()=>{shut(false);feed(0,1,1,'#ffc94d');pressure(0);orbit(3.2);markOff();map.classList.remove('oStage','o1','o2');fxG.innerHTML=''};
+const resetMap=()=>{shut(false);feed(0,1,1,'#ffc94d');pressure(0);orbit(3.2);markOff();map.classList.remove('oStage','o1','o2');fxG.innerHTML='';$('futP').setAttribute('d','');$('futN').setAttribute('d','');$('futQ').setAttribute('opacity',0)};
 
 /* fitra drawing */
 const FN=[[350,150,'المعتاد'],[262,138,'أشد'],[176,104,'أغرب'],[92,52,'انتكاس الفطرة']];
@@ -739,11 +755,57 @@ const S=[
  const heal=()=>{fitDraw(3,true);$('fst').insertAdjacentHTML('afterend','<p class="call mint" id="fend">وكما انحرف الطريق بالتدريج، يعود بالتدريج: كل مرة تترك فيها المحفز تقرّبك من الفطرة، وتتعافى النجمة شيئًا فشيئًا.</p>');reveal($('fend'));nextP({pulse:1})};
  const more=()=>{n++;paint();reveal($('fst'));if(n<3)setP(`تعوّد أكثر (${ar(n+1)} من ٣)`,more,{hint:'استمر، ولاحظ الطريق والنجمة'});else setP('ابدأ العودة',heal,{pulse:1,hint:'اضغط، وراقب الطريق والنجمة'})};
  setP('تعوّد أكثر (١ من ٣)',more,{pulse:1,hint:'جرّب بنفسك: اضغط الزر'})}},
+{id:'ends',ch:2,name:'نهاية الموجة',vis:'map',h:'t',cam:[222,392,390,440],show:['star','brain','orbit','wave','dline'],
+ html:()=>`<h2>كيف تنتهي الموجة؟</h2><p>أنت في قمّة الموجة، ولها نهايتان: أن تصبر حتى تمرّ، أو النزول (خروج المَنِيّ). جرّب الاثنتين، وقارن.</p>
+<div class="ends"><button class="hold" id="hold"><i class="fill"></i><b>اصبر حتى تمرّ</b><small>اضغط مطوّلًا</small></button><button class="nz" id="nzB"><b>النزول</b><small>اضغط مرة</small></button></div>
+<p class="hst" id="hst" aria-live="polite"></p><div class="ekey" id="eout"></div>`,
+ enter(){
+ const G=(t,c,h,sd)=>h*Math.exp(-((t-c)**2)/(2*sd*sd)),TP=.2;
+ const cur=t=>.04+(t<=TP?G(t,TP,.78,.07):G(t,TP,.78,.1));
+ const cliff=t=>t<=TP?cur(t):t<TP+.035?.04+.78*(1-(t-TP)/.035):.04;
+ const fP=t=>.04+G(t,.68,.4,.06)+G(t,.92,.28,.05);
+ const fN=t=>.04+[.52,.62,.72,.82,.92].reduce((a,c,k)=>a+G(t,c,.8+k*.05,.03),0);
+ const T=[];const later=(f,ms)=>T.push(setTimeout(f,reduce?0:ms));
+ const hold=$('hold'),nzB=$('nzB'),hst=$('hst');
+ const tried=new Set();let busy=false,hp=0,holding=false,raf=null,last=0,lvl=-1,atPeak=true;
+ onLeave(()=>{T.forEach(clearTimeout);if(raf)cancelAnimationFrame(raf)});
+ const fut=(id,fn)=>{const el=$(id),t0=performance.now();const draw=k=>{let d='';for(let i=0;i<=80;i++){const t=.47+i/80*.53,v=.04+(fn(t)-.04)*k;d+=(i?'L':'M')+wX(t).toFixed(1)+' '+wY(v).toFixed(1)}el.setAttribute('d',d)};if(reduce){draw(1);return}const f=now=>{const k=Math.min(1,(now-t0)/1000),e=1-Math.pow(1-k,3);draw(e);if(k<1&&el.isConnected)requestAnimationFrame(f)};requestAnimationFrame(f)};
+ const setLvl=k=>{if(k===lvl)return;lvl=k;pressure(k);orbit([3.4,2.6,1.8,1.2][k])};
+ const peak=()=>{waveTo(cur);markAt(TP,'أنت هنا','#ffc94d');starTo({l:1.35},400);lvl=-1;setLvl(3);atPeak=true};
+ const out=(k,html)=>{const c=k==='p'?'#4ee0a6':'#ff7a7a';$('eout').insertAdjacentHTML('beforeend',`<p><svg viewBox="0 0 26 12"><path d="M1 6H25" stroke="${c}" stroke-width="3"${k==='p'?' stroke-dasharray="5 4"':''} fill="none"/></svg><span>${html}</span></p>`);reveal($('eout'))};
+ const check=()=>{if(tried.size===2){if(!$('eend')){$('eout').insertAdjacentHTML('afterend','<p class="call warn" id="eend">كلاهما أنهى الموجة، لكن الصبر يُضعف الموجات القادمة ويُعافي النجمة، والنزول يقوّيها ويزيد تشوّه النجمة ويترك الذنب. <b>النزول لا يحل المشكلة، بل يضاعفها.</b></p>');reveal($('eend'))}nextP({pulse:1})}
+  else setP('جرّب الطريق الآخر',null,{locked:1,hint:tried.has('p')?'الآن جرّب «النزول»، وقارن ما يحدث بعده':'الآن اضغط مطوّلًا على «اصبر حتى تمرّ»، وقارن'})};
+ /* patience: press and hold */
+ const HOLD=4.5;
+ const apply=()=>{hold.style.setProperty('--p',hp.toFixed(3));markAt(TP+hp*.26,hp<.35?'اصبر…':hp<.75?'تهبط…':'تكاد تمرّ','#4ee0a6');starTo({l:1.35-1.2*hp},0);setLvl(hp<.25?3:hp<.5?2:hp<.8?1:0);
+  hst.textContent=holding?(hp<.35?'الرغبة في قمّتها… اصبر':hp<.75?'تهبط شيئًا فشيئًا…':'اقتربت… تكاد تمرّ'):(hp>0?'لا تترك! الموجة ما زالت عالية. اضغط مطوّلًا حتى تمرّ.':'');hst.style.color=holding?'#4ee0a6':'#ffc94d'};
+ const doneP=()=>{holding=false;hold.classList.remove('on');tried.add('p');hold.classList.add('done');hold.querySelector('small').textContent='مرّت';atPeak=false;hst.textContent='';
+  markAt(TP+.26,'مرّت','#4ee0a6');starTo({l:.15,d:Math.max(0,stS.d-.1)},700);setLvl(0);fut('futP',fP);$('futQ').setAttribute('opacity',0);
+  try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}
+  out('p','<b style="color:#4ee0a6">بعد الصبر:</b> هدأت وحدها، والموجات التالية أضعف وأبعد.');check()};
+ const tick=now=>{const dt=Math.min(.05,(now-last)/1000);last=now;hp=holding?Math.min(1,hp+dt/HOLD):Math.max(0,hp-dt*.15);apply();if(hp>=1){raf=null;doneP();return}raf=(holding||hp>0)?requestAnimationFrame(tick):null};
+ const start=e=>{e.preventDefault();if(busy||tried.has('p')||holding)return;if(e.pointerId!=null)try{hold.setPointerCapture(e.pointerId)}catch(_){}
+  if(!atPeak)peak();holding=true;hold.classList.add('on');if(!raf){last=performance.now();raf=requestAnimationFrame(tick)}};
+ const stop=()=>{if(!holding)return;holding=false;hold.classList.remove('on');apply()};
+ hold.addEventListener('pointerdown',start);['pointerup','pointercancel','lostpointercapture'].forEach(v=>hold.addEventListener(v,stop));
+ hold.addEventListener('contextmenu',e=>e.preventDefault());
+ hold.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat)start(e)});hold.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter')stop()});
+ /* النزول: a sudden drop, then the rebound */
+ const nz=()=>{if(busy||holding||tried.has('n'))return;busy=true;hp=0;hold.style.setProperty('--p',0);hst.textContent='';
+  const run=()=>{atPeak=false;markAt(TP,'النزول','#ff7a7a');starTo({l:1.7},160,()=>starTo({l:0},320));waveTo(cliff);setLvl(0);
+   later(()=>{markAt(TP+.045,'هدأت… لحظات','#ff7a7a');hst.style.color='#ff7a7a';hst.textContent='انطفأت الرغبة… لحظات'},700);
+   later(()=>{markOff();starTo({l:1.45,d:Math.min(1,stS.d+.15)},1200);pressure(2,4);lvl=-1;orbit(.9);fut('futN',fN);$('futQ').setAttribute('opacity',0);
+    tried.add('n');nzB.classList.add('done');nzB.querySelector('small').textContent='جرّبته';busy=false;
+    hst.textContent='';out('n','<b style="color:#ff7a7a">بعد النزول:</b> هدأت لحظات، ثم عادت أسرع وأقوى.');check()},2200)};
+  if(!atPeak){peak();later(run,750)}else run()};
+ nzB.addEventListener('click',nz);
+ waveTo(cur,true);markAt(TP,'أنت هنا','#ffc94d');starTo({l:1.35},500);setLvl(3);$('futQ').setAttribute('opacity',1);
+ setP('جرّب الطريقين في الأعلى',null,{locked:1,hint:'ابدأ بالصبر: اضغط مطوّلًا على «اصبر حتى تمرّ»'})}},
 {id:'fallY',ch:2,only:'y',name:'النزول',vis:'map',h:'n',cam:[252,566,262],show:['star','eye','beam','brain','orbit','arrow','wave','fallY'],focus:['fallY','wave'],
- html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول.</p><p class="call">النزول هو خروج المَنِيّ.</p><p>وخروج المني في غير الزواج، أو في غير الاحتِلام أثناء النوم، غير صحيح ومحرّم، ويضرّك نفسيًا وذهنيًا.</p><p class="call warn">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>`,
+ html:()=>`<h2>النزول وحكمه</h2><p class="call">النزول هو خروج المَنِيّ.</p><p>وخروج المني في غير الزواج، أو في غير الاحتِلام أثناء النوم، غير صحيح ومحرّم، ويضرّك نفسيًا وذهنيًا.</p><p class="call warn">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>`,
  enter(){waveTo(fSingle,true);nextP()}},
 {id:'fall',ch:2,only:'o',name:'النزول',vis:'map',h:'n',cam:[252,566,262],show:['star','eye','beam','brain','orbit','arrow','wave','fallS','fallG'],focus:['fallS','fallG','wave'],
- html:()=>`<h2>السقوط: النزول</h2><p>الموجة تنتهي إما بمرور الوقت إن صبرت، أو بالنزول (خروج المني). والنزول طريقان، وكلاهما خطأ:</p><div class="two"><button data-p="S">فردي</button><button data-p="G">مع آخرين</button></div><div id="panes"></div>`,
+ html:()=>`<h2>النزول: طريقان، وكلاهما خطأ</h2><p>النزول (خروج المَنِيّ) طريقان، وكلاهما خطأ:</p><div class="two"><button data-p="S">فردي</button><button data-p="G">مع آخرين</button></div><div id="panes"></div>`,
  enter(){waveTo(fSingle,true);const T={S:'<b>فردي (الاستمناء):</b> أضرار نفسية وذهنية: تعلّق وإدمان، وتشتّت التركيز، وشعور دائم بالذنب.',G:'<b>مع آخرين (الزنا أو اللواط):</b> كل ما سبق، ويُضاف إليه: الأمراض الجنسية المعدية، والفضيحة؛ فقد لا يرى الطرف الآخر في الأمر خطأً، أو ينقلب عليك، والابتزاز.'};
  const got=new Set();const upd=()=>{if(got.size<2)setP(`اضغط الطريقين (${ar(got.size)} من ٢)`,null,{locked:1,hint:'اضغط «فردي» ثم «مع آخرين» في الأعلى'});else{if(!$('endC')){$('panes').insertAdjacentHTML('afterend','<p class="call warn" id="endC">النزول لا يحل المشكلة، بل يضاعفها. <b>الحل هو الترك.</b></p>');reveal($('endC'))}nextP({pulse:1})}};
  card.querySelectorAll('.two button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.p;card.querySelectorAll('.two button').forEach(x=>x.classList.toggle('on',x===b));setShow(this.show,['fall'+k]);if(!got.has(k)){got.add(k);$('panes').insertAdjacentHTML('beforeend',`<div class="paneX">${T[k]}</div>`);reveal($('panes').lastElementChild)}upd()}));upd()}},
